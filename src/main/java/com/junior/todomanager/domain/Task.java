@@ -22,10 +22,12 @@ public class Task implements Serializable {
     private Long id;
     private String title;
     private String description;
+    @Column(name = "status")
     @Enumerated(value = EnumType.STRING)
     private TaskStatus taskStatus;
     private LocalDateTime dueDate;
     // Enum was the choice because a class category is not necessary for a personal project.
+    @Column(name = "category")
     @Enumerated(value = EnumType.STRING)
     private TaskCategory taskCategory;
 
