@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Builder
+@EqualsAndHashCode(of = "id")
 public class Task implements Serializable {
     private static final Long serialLongID = 1L;
     @Id
@@ -25,7 +26,7 @@ public class Task implements Serializable {
     @Column(name = "status")
     @Enumerated(value = EnumType.STRING)
     private TaskStatus taskStatus;
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
     // Enum was the choice because a class category is not necessary for a personal project.
     @Column(name = "category")
     @Enumerated(value = EnumType.STRING)
