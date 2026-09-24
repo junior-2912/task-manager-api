@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-public class TaskRequestDto {
+public class TaskRequestPostDto {
     @NotBlank
     private String title;
     private String description;
