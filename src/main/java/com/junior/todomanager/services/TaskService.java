@@ -1,7 +1,8 @@
 package com.junior.todomanager.services;
 
 import com.junior.todomanager.domain.Task;
-import com.junior.todomanager.dto.TaskRequestDto;
+import com.junior.todomanager.dto.TaskRequestPostDto;
+import com.junior.todomanager.dto.TaskRequestPutDto;
 import com.junior.todomanager.exceptions.DateInvalidException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
 import com.junior.todomanager.repository.TaskRepository;
@@ -28,17 +29,30 @@ public class TaskService {
     }
 
     @Transactional
-    public Task save(TaskRequestDto taskRequestDto) {
-        if (taskRequestDto.getDueDate().isBefore(LocalDate.now())) {
+    public Task save(TaskRequestPostDto taskRequestPostDto) {
+        if (taskRequestPostDto.getDueDate().isBefore(LocalDate.now())) {
             throw new DateInvalidException("Due date cannot be earlier than today");
         }
         Task task = Task.builder()
-                .title(taskRequestDto.getTitle())
-                .description(taskRequestDto.getDescription())
-                .taskCategory(taskRequestDto.getTaskCategory())
-                .taskStatus(taskRequestDto.getTaskStatus())
-                .dueDate(taskRequestDto.getDueDate())
+                .title(taskRequestPostDto.getTitle())
+                .description(taskRequestPostDto.getDescription())
+                .taskCategory(taskRequestPostDto.getTaskCategory())
+                .taskStatus(taskRequestPostDto.getTaskStatus())
+                .dueDate(taskRequestPostDto.getDueDate())
                 .build();
+
+        return taskRepository.save(task);
+    }
+
+    @Transactional
+    public Task update(TaskRequestPutDto taskRequestPutDto) {
+
+        Task task = findById(taskRequestPutDto.getId());
+        task.setTitle(taskRequestPutDto.getTitle());
+        task.setDescription(taskRequestPutDto.getDescription());
+        task.setTaskCategory(taskRequestPutDto.getTaskCategory());
+        task.setTaskStatus(taskRequestPutDto.getTaskStatus());
+        task.setDueDate(taskRequestPutDto.getDueDate());
 
         return taskRepository.save(task);
     }

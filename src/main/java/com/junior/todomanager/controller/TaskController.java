@@ -1,9 +1,9 @@
 package com.junior.todomanager.controller;
 
 import com.junior.todomanager.domain.Task;
-import com.junior.todomanager.dto.TaskRequestDto;
+import com.junior.todomanager.dto.TaskRequestPostDto;
+import com.junior.todomanager.dto.TaskRequestPutDto;
 import com.junior.todomanager.services.TaskService;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +30,8 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> save(@Valid @RequestBody TaskRequestDto taskRequestDto) {
-        Task task = service.save(taskRequestDto);
+    public ResponseEntity<Task> save(@Valid @RequestBody TaskRequestPostDto taskRequestPostDto) {
+        Task task = service.save(taskRequestPostDto);
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -40,5 +40,12 @@ public class TaskController {
                 .toUri();
 
         return ResponseEntity.created(uri).body(task);
+    }
+
+    @PutMapping
+    public ResponseEntity<Task> update(@Valid @RequestBody TaskRequestPutDto taskRequestPutDto) {
+        Task task = service.update(taskRequestPutDto);
+
+        return ResponseEntity.ok(task);
     }
 }
