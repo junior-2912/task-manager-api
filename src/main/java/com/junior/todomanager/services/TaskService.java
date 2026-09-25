@@ -30,6 +30,7 @@ public class TaskService {
 
     @Transactional
     public Task save(TaskRequestPostDto taskRequestPostDto) {
+        // TODO - fix the date condition
         if (taskRequestPostDto.getDueDate().isBefore(LocalDate.now())) {
             throw new DateInvalidException("Due date cannot be earlier than today");
         }
@@ -46,6 +47,7 @@ public class TaskService {
 
     @Transactional
     public Task update(TaskRequestPutDto taskRequestPutDto, Long id) {
+        //TODO - implements date condition
 
         Task task = findById(id);
         task.setTitle(taskRequestPutDto.getTitle());

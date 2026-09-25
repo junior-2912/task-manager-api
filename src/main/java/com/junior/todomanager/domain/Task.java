@@ -32,6 +32,8 @@ public class Task implements Serializable {
     @Enumerated(value = EnumType.STRING)
     private TaskCategory taskCategory;
 
+
+    //TODO implements this method
     public void finishTask() {
         setTaskStatus(TaskStatus.FINISHED);
     }
