@@ -45,9 +45,9 @@ public class TaskService {
     }
 
     @Transactional
-    public Task update(TaskRequestPutDto taskRequestPutDto) {
+    public Task update(TaskRequestPutDto taskRequestPutDto, Long id) {
 
-        Task task = findById(taskRequestPutDto.getId());
+        Task task = findById(id);
         task.setTitle(taskRequestPutDto.getTitle());
         task.setDescription(taskRequestPutDto.getDescription());
         task.setTaskCategory(taskRequestPutDto.getTaskCategory());

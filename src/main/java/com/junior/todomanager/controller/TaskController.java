@@ -42,9 +42,9 @@ public class TaskController {
         return ResponseEntity.created(uri).body(task);
     }
 
-    @PutMapping
-    public ResponseEntity<Task> update(@Valid @RequestBody TaskRequestPutDto taskRequestPutDto) {
-        Task task = service.update(taskRequestPutDto);
+    @PutMapping("/{id}")
+    public ResponseEntity<Task> update(@Valid @RequestBody TaskRequestPutDto taskRequestPutDto,@PathVariable Long id) {
+        Task task = service.update(taskRequestPutDto, id);
 
         return ResponseEntity.ok(task);
     }
