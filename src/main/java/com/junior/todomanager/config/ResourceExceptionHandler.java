@@ -1,6 +1,7 @@
 package com.junior.todomanager.config;
 
 import com.junior.todomanager.exceptions.DateInvalidException;
+import com.junior.todomanager.exceptions.DeleteTaskException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
 import com.junior.todomanager.exceptions.StandardError;
 import jakarta.servlet.http.HttpServlet;
@@ -36,6 +37,18 @@ public class ResourceExceptionHandler {
         error.setTimestamp(Instant.now());
         error.setStatus(HttpStatus.CONFLICT.value());
         error.setError("Conflict");
+        error.setMessage(e.getMessage());
+        error.setPath(request.getRequestURI());
+
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
+    @ExceptionHandler(DeleteTaskException.class)
+    public ResponseEntity<StandardError> deleteTaskException(DeleteTaskException e, HttpServletRequest request) {
+        StandardError error = new StandardError();
+        error.setError("Conflict");
+        error.setTimestamp(Instant.now());
+        error.setStatus(HttpStatus.CONFLICT.value());
         error.setMessage(e.getMessage());
         error.setPath(request.getRequestURI());
 
