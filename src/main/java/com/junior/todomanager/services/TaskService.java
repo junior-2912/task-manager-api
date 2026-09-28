@@ -3,6 +3,7 @@ package com.junior.todomanager.services;
 import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.dto.TaskRequestPostDto;
 import com.junior.todomanager.dto.TaskRequestPutDto;
+import com.junior.todomanager.dto.TaskStatusRequestDto;
 import com.junior.todomanager.enums.TaskStatus;
 import com.junior.todomanager.exceptions.DateInvalidException;
 import com.junior.todomanager.exceptions.DeleteTaskException;
@@ -67,13 +68,31 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-    public Task finishTask(Long id) {
+    @Transactional
+    public void finishTask(Long id) {
         Task task = findById(id);
         if (task.getTaskStatus().equals(TaskStatus.FINISHED)) {
             throw new TaskAlreadyFinishedException("This task has already been finished");
         }
         task.finishTask();
         taskRepository.save(task);
+    }
+
+    @Transactional
+    public Task changeTaskStatus(Long id, TaskStatusRequestDto taskStatusRequestDto) {
+        Task task = findById(id);
+
+        if (task.getTaskStatus().equals(TaskStatus.FINISHED)) {
+            throw new TaskAlreadyFinishedException("This task has already been finished");
+        }
+
+        if (taskStatusRequestDto.getStatus().equals(TaskStatus.FINISHED)) {
+            finishTask(id);
+        }
+
+        task.setTaskStatus(taskStatusRequestDto.getStatus());
+        taskRepository.save(task);
+
         return task;
     }
 }

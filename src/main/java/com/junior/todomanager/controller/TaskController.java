@@ -3,6 +3,7 @@ package com.junior.todomanager.controller;
 import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.dto.TaskRequestPostDto;
 import com.junior.todomanager.dto.TaskRequestPutDto;
+import com.junior.todomanager.dto.TaskStatusRequestDto;
 import com.junior.todomanager.services.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -55,9 +56,8 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/finish")
-    public ResponseEntity<Task> finishTask(@PathVariable Long id) {
-
-        return ResponseEntity.ok(service.finishTask(id));
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Task> changeStatus(@PathVariable Long id, @RequestBody TaskStatusRequestDto taskStatusRequestDto) {
+        return ResponseEntity.ok(service.changeTaskStatus(id, taskStatusRequestDto));
     }
 }
