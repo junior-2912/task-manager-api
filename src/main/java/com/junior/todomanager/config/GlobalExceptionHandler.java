@@ -1,12 +1,7 @@
 package com.junior.todomanager.config;
 
-import com.junior.todomanager.exceptions.DateInvalidException;
-import com.junior.todomanager.exceptions.DeleteTaskException;
-import com.junior.todomanager.exceptions.ResourceNotFoundException;
-import com.junior.todomanager.exceptions.StandardError;
-import jakarta.servlet.http.HttpServlet;
+import com.junior.todomanager.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.experimental.StandardException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,10 +10,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.Instant;
 
 @RestControllerAdvice
-public class ResourceExceptionHandler {
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<StandardError> resourceNotFound(ResourceNotFoundException e, HttpServletRequest request) {
+    public ResponseEntity<StandardError> resourceNotFoundException(ResourceNotFoundException e, HttpServletRequest request) {
         StandardError error = new StandardError();
 
         error.setTimestamp(Instant.now());
@@ -31,7 +26,7 @@ public class ResourceExceptionHandler {
     }
 
     @ExceptionHandler(DateInvalidException.class)
-    public ResponseEntity<StandardError> dateInvalid(DateInvalidException e, HttpServletRequest request) {
+    public ResponseEntity<StandardError> dateInvalidException(DateInvalidException e, HttpServletRequest request) {
         StandardError error = new StandardError();
 
         error.setTimestamp(Instant.now());
@@ -46,6 +41,19 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(DeleteTaskException.class)
     public ResponseEntity<StandardError> deleteTaskException(DeleteTaskException e, HttpServletRequest request) {
         StandardError error = new StandardError();
+        error.setError("Conflict");
+        error.setTimestamp(Instant.now());
+        error.setStatus(HttpStatus.CONFLICT.value());
+        error.setMessage(e.getMessage());
+        error.setPath(request.getRequestURI());
+
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
+    @ExceptionHandler(TaskAlreadyFinishedException.class)
+    public ResponseEntity<StandardError> taskAlreadyFinishedException(TaskAlreadyFinishedException e, HttpServletRequest request) {
+        StandardError error = new StandardError();
+
         error.setError("Conflict");
         error.setTimestamp(Instant.now());
         error.setStatus(HttpStatus.CONFLICT.value());

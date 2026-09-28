@@ -7,6 +7,7 @@ import com.junior.todomanager.enums.TaskStatus;
 import com.junior.todomanager.exceptions.DateInvalidException;
 import com.junior.todomanager.exceptions.DeleteTaskException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
+import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
 import com.junior.todomanager.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,13 +36,10 @@ public class TaskService {
         if (taskRequestPostDto.getDueDate() != null && taskRequestPostDto.getDueDate().isBefore(LocalDate.now())) {
             throw new DateInvalidException("Due date cannot be earlier than today");
         }
-        Task task = Task.builder()
-                .title(taskRequestPostDto.getTitle())
-                .description(taskRequestPostDto.getDescription())
-                .taskCategory(taskRequestPostDto.getTaskCategory())
-                .taskStatus(taskRequestPostDto.getTaskStatus())
-                .dueDate(taskRequestPostDto.getDueDate())
-                .build();
+        Task task = new Task(taskRequestPostDto.getTitle(),
+                taskRequestPostDto.getDescription(),
+                taskRequestPostDto.getDueDate(),
+                taskRequestPostDto.getTaskCategory());
 
         return taskRepository.save(task);
     }
@@ -55,7 +53,6 @@ public class TaskService {
         task.setTitle(taskRequestPutDto.getTitle());
         task.setDescription(taskRequestPutDto.getDescription());
         task.setTaskCategory(taskRequestPutDto.getTaskCategory());
-        task.setTaskStatus(taskRequestPutDto.getTaskStatus());
         task.setDueDate(taskRequestPutDto.getDueDate());
 
         return taskRepository.save(task);
@@ -68,5 +65,15 @@ public class TaskService {
             throw new DeleteTaskException("Actives task cannot be deleted");
         }
         taskRepository.deleteById(id);
+    }
+
+    public Task finishTask(Long id) {
+        Task task = findById(id);
+        if (task.getTaskStatus().equals(TaskStatus.FINISHED)) {
+            throw new TaskAlreadyFinishedException("This task has already been finished");
+        }
+        task.finishTask();
+        taskRepository.save(task);
+        return task;
     }
 }

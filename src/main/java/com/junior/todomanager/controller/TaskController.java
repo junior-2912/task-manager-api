@@ -54,4 +54,10 @@ public class TaskController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/finish")
+    public ResponseEntity<Task> finishTask(@PathVariable Long id) {
+
+        return ResponseEntity.ok(service.finishTask(id));
+    }
 }
