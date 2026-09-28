@@ -9,12 +9,10 @@ import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-@Builder
 @EqualsAndHashCode(of = "id")
 public class Task implements Serializable {
     private static final Long serialLongID = 1L;
@@ -32,8 +30,14 @@ public class Task implements Serializable {
     @Enumerated(value = EnumType.STRING)
     private TaskCategory taskCategory;
 
+    public Task(String title, String description, LocalDate dueDate, TaskCategory taskCategory) {
+        this.title = title;
+        this.description = description;
+        this.taskStatus = TaskStatus.PENDING;
+        this.dueDate = dueDate;
+        this.taskCategory = taskCategory;
+    }
 
-    //TODO implements this method
     public void finishTask() {
         setTaskStatus(TaskStatus.FINISHED);
     }

@@ -15,8 +15,6 @@ public class TaskRequestPutDto {
     @NotBlank
     private String title;
     private String description;
-    @NotNull
-    private TaskStatus taskStatus;
     private LocalDate dueDate;
     @NotNull
     private TaskCategory taskCategory;
