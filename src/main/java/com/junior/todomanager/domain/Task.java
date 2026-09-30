@@ -19,11 +19,16 @@ public class Task implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String title;
+
     private String description;
     @Column(name = "status")
     @Enumerated(value = EnumType.STRING)
     private TaskStatus taskStatus;
+
+    @Column(nullable = false)
     private LocalDate dueDate;
     // Enum was the choice because a class category is not necessary for a personal project.
     @Column(name = "category")
