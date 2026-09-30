@@ -7,6 +7,8 @@ import com.junior.todomanager.dto.TaskStatusRequestDto;
 import com.junior.todomanager.services.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -21,8 +23,8 @@ public class TaskController {
     private final TaskService service;
 
     @GetMapping
-    public ResponseEntity<List<Task>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<Page<Task>> findAll(Pageable pageable) {
+        return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @GetMapping("/{id}")

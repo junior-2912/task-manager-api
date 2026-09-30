@@ -10,6 +10,8 @@ import com.junior.todomanager.exceptions.DeleteTaskException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
 import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
 import com.junior.todomanager.repository.TaskRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +26,8 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public List<Task> findAll() {
-        return taskRepository.findAll();
+    public Page<Task> findAll(Pageable pageable) {
+        return taskRepository.findAll(pageable);
     }
 
     public Task findById(Long id) {
@@ -95,4 +97,6 @@ public class TaskService {
 
         return task;
     }
+
+
 }
