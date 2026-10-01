@@ -4,19 +4,21 @@ import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.dto.TaskRequestPostDto;
 import com.junior.todomanager.dto.TaskRequestPutDto;
 import com.junior.todomanager.dto.TaskStatusRequestDto;
+import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
 import com.junior.todomanager.exceptions.DateInvalidException;
 import com.junior.todomanager.exceptions.DeleteTaskException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
 import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
 import com.junior.todomanager.repository.TaskRepository;
+import com.junior.todomanager.specification.TaskSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 public class TaskService {
@@ -26,8 +28,16 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public Page<Task> findAll(Pageable pageable) {
-        return taskRepository.findAll(pageable);
+    public Page<Task> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title) {
+        Specification<Task> specification = Specification.unrestricted();
+
+        if (status != null) specification = specification.and(TaskSpecification.hasStatus(status));
+
+        if (category != null) specification = specification.and(TaskSpecification.hasCategory(category));
+
+        if (title != null && !title.isBlank()) specification = specification.and(TaskSpecification.titleContains(title));
+
+        return taskRepository.findAll(specification, pageable);
     }
 
     public Task findById(Long id) {
@@ -97,6 +107,4 @@ public class TaskService {
 
         return task;
     }
-
-
 }

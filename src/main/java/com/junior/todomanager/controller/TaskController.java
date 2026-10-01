@@ -4,6 +4,8 @@ import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.dto.TaskRequestPostDto;
 import com.junior.todomanager.dto.TaskRequestPutDto;
 import com.junior.todomanager.dto.TaskStatusRequestDto;
+import com.junior.todomanager.enums.TaskCategory;
+import com.junior.todomanager.enums.TaskStatus;
 import com.junior.todomanager.services.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/tasks")
@@ -23,8 +24,11 @@ public class TaskController {
     private final TaskService service;
 
     @GetMapping
-    public ResponseEntity<Page<Task>> findAll(Pageable pageable) {
-        return ResponseEntity.ok(service.findAll(pageable));
+    public ResponseEntity<Page<Task>> findAll(Pageable pageable,
+                                              @RequestParam(required = false) TaskStatus status,
+                                              @RequestParam(required = false) TaskCategory category,
+                                              @RequestParam(required = false) String title) {
+        return ResponseEntity.ok(service.findAll(pageable, status, category, title));
     }
 
     @GetMapping("/{id}")
