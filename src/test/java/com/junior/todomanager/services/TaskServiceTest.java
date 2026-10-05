@@ -11,6 +11,7 @@ import com.junior.todomanager.exceptions.ResourceNotFoundException;
 import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
 import com.junior.todomanager.repository.TaskRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -107,5 +108,29 @@ class TaskServiceTest {
         taskService.finishTask(1000L);
         assertEquals(TaskStatus.FINISHED, task.getTaskStatus());
         verify(taskRepository).save(task);
+    }
+
+    @Test
+    void shouldSaveAValidTask() {
+        TaskRepository taskRepository = mock(TaskRepository.class);
+        TaskService taskService = new TaskService(taskRepository);
+
+        TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto("Tarefa de teste 1",
+                "Fazendo teste com JUnit",
+                LocalDate.parse("3000-01-05"),
+                TaskCategory.PERSONAL);
+
+        taskService.save(taskRequestPostDto);
+
+        ArgumentCaptor<Task> captor = ArgumentCaptor.forClass(Task.class);
+
+        verify(taskRepository).save(captor.capture());
+
+        Task taskCapted = captor.getValue();
+
+        assertEquals("Tarefa de teste 1", taskCapted.getTitle());
+        assertEquals("Fazendo teste com JUnit", taskCapted.getDescription());
+        assertEquals(LocalDate.parse("3000-01-05"), taskCapted.getDueDate());
+        assertEquals(TaskCategory.PERSONAL, taskCapted.getTaskCategory());
     }
 }
