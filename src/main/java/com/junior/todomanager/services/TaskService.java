@@ -35,7 +35,8 @@ public class TaskService {
 
         if (category != null) specification = specification.and(TaskSpecification.hasCategory(category));
 
-        if (title != null && !title.isBlank()) specification = specification.and(TaskSpecification.titleContains(title));
+        if (title != null && !title.isBlank())
+            specification = specification.and(TaskSpecification.titleContains(title));
 
         return taskRepository.findAll(specification, pageable);
     }
@@ -83,7 +84,7 @@ public class TaskService {
     @Transactional
     public void finishTask(Long id) {
         Task task = findById(id);
-        if (task.getTaskStatus().equals(TaskStatus.FINISHED)) {
+        if (task.getTaskStatus().equals(TaskStatus.FINISHED) || task.getTaskStatus().equals(TaskStatus.CANCELED)) {
             throw new TaskAlreadyFinishedException("This task has already been finished");
         }
         task.finishTask();
@@ -94,15 +95,16 @@ public class TaskService {
     public Task changeTaskStatus(Long id, TaskStatusRequestDto taskStatusRequestDto) {
         Task task = findById(id);
 
-        if (task.getTaskStatus().equals(TaskStatus.FINISHED)) {
+        if (task.getTaskStatus().equals(TaskStatus.FINISHED) || task.getTaskStatus().equals(TaskStatus.CANCELED)) {
             throw new TaskAlreadyFinishedException("This task has already been finished");
         }
 
-        if (taskStatusRequestDto.getStatus().equals(TaskStatus.FINISHED)) {
-            finishTask(id);
+        if (TaskStatus.FINISHED.equals(taskStatusRequestDto.getStatus())) {
+            task.finishTask();
+        } else {
+            task.setTaskStatus(taskStatusRequestDto.getStatus());
         }
 
-        task.setTaskStatus(taskStatusRequestDto.getStatus());
         taskRepository.save(task);
 
         return task;
