@@ -5,6 +5,8 @@ import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDate;
+
 public class TaskSpecification {
     public static Specification<Task> hasStatus(TaskStatus taskStatus) {
         return (root, query, builder) ->
@@ -22,5 +24,11 @@ public class TaskSpecification {
                         criteriaBuilder.lower(root.get("title")),
                         "%" + title.toLowerCase() + "%"
                 );
+    }
+
+    //TODO - Fazer a implementacao desse metodo
+    public static Specification<Task> overDue(LocalDate dueDate) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.
     }
 }
