@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.function.BinaryOperator;
 
 @Service
 public class TaskService {
@@ -28,7 +30,7 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public Page<Task> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title) {
+    public Page<Task> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overDue) {
         Specification<Task> specification = Specification.unrestricted();
 
         if (status != null) specification = specification.and(TaskSpecification.hasStatus(status));
@@ -37,6 +39,10 @@ public class TaskService {
 
         if (title != null && !title.isBlank())
             specification = specification.and(TaskSpecification.titleContains(title));
+
+        if (overDue != null) {
+            if (overDue) specification = specification.and(TaskSpecification.overDue());
+        }
 
         return taskRepository.findAll(specification, pageable);
     }
@@ -47,7 +53,7 @@ public class TaskService {
 
     @Transactional
     public Task save(TaskRequestPostDto taskRequestPostDto) {
-        if (taskRequestPostDto.getDueDate() != null && taskRequestPostDto.getDueDate().isBefore(LocalDate.now())) {
+        if (taskRequestPostDto.getDueDate() != null && taskRequestPostDto.getDueDate().isBefore(LocalDateTime.now())) {
             throw new DateInvalidException("Due date cannot be earlier than today");
         }
         Task task = new Task(taskRequestPostDto.getTitle(),
@@ -60,7 +66,7 @@ public class TaskService {
 
     @Transactional
     public Task update(TaskRequestPutDto taskRequestPutDto, Long id) {
-        if (taskRequestPutDto.getDueDate() != null && taskRequestPutDto.getDueDate().isBefore(LocalDate.now())) {
+        if (taskRequestPutDto.getDueDate() != null && taskRequestPutDto.getDueDate().isBefore(LocalDateTime.now())) {
             throw new DateInvalidException("Due date cannot be earlier than today");
         }
         Task task = findById(id);

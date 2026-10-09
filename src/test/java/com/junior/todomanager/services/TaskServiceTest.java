@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,7 +26,7 @@ class TaskServiceTest {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDate.parse("2000-01-05"), TaskCategory.PERSONAL);
+        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
         task.setId(1000L);
 
         when(taskRepository.findById(1000L)).thenReturn(Optional.of(task));
@@ -38,8 +39,8 @@ class TaskServiceTest {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
-        TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDate.parse("2000-01-05"), TaskCategory.PERSONAL);
-        TaskRequestPutDto taskRequestPutDto = new TaskRequestPutDto("Tarefa de teste 2", "Fazendo teste com JUnit", LocalDate.parse("2001-01-05"), TaskCategory.PERSONAL);
+        TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
+        TaskRequestPutDto taskRequestPutDto = new TaskRequestPutDto("Tarefa de teste 2", "Fazendo teste com JUnit", LocalDateTime.parse("2001-01-05T12:00:00"), TaskCategory.PERSONAL);
 
 
         assertThrows(DateInvalidException.class, () -> taskService.save(taskRequestPostDto));
@@ -53,7 +54,7 @@ class TaskServiceTest {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDate.parse("2000-01-05"), TaskCategory.PERSONAL);
+        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
         task.setId(1000L);
 
         when(taskRepository.findById(1000L)).thenReturn(Optional.of(task));
@@ -68,7 +69,7 @@ class TaskServiceTest {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDate.parse("2000-01-05"), TaskCategory.PERSONAL);
+        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
         task.setId(1000L);
         task.setTaskStatus(TaskStatus.FINISHED);
 
@@ -84,7 +85,7 @@ class TaskServiceTest {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDate.parse("2000-01-05"), TaskCategory.PERSONAL);
+        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
         task.setId(1000L);
         task.setTaskStatus(TaskStatus.FINISHED);
 
@@ -100,7 +101,7 @@ class TaskServiceTest {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDate.parse("2000-01-05"), TaskCategory.PERSONAL);
+        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
         task.setId(1000L);
 
         when(taskRepository.findById(1000L)).thenReturn(Optional.of(task));
@@ -117,7 +118,7 @@ class TaskServiceTest {
 
         TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto("Tarefa de teste 1",
                 "Fazendo teste com JUnit",
-                LocalDate.parse("3000-01-05"),
+                LocalDateTime.parse("3000-01-05T12:00:00"),
                 TaskCategory.PERSONAL);
 
         taskService.save(taskRequestPostDto);
@@ -130,7 +131,7 @@ class TaskServiceTest {
 
         assertEquals("Tarefa de teste 1", taskCapted.getTitle());
         assertEquals("Fazendo teste com JUnit", taskCapted.getDescription());
-        assertEquals(LocalDate.parse("3000-01-05"), taskCapted.getDueDate());
+        assertEquals(LocalDateTime.parse("3000-01-05T12:00:00"), taskCapted.getDueDate());
         assertEquals(TaskCategory.PERSONAL, taskCapted.getTaskCategory());
     }
 }

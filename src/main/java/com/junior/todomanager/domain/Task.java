@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Getter
@@ -29,13 +30,13 @@ public class Task implements Serializable {
     private TaskStatus taskStatus;
 
     @Column(nullable = false)
-    private LocalDate dueDate;
+    private LocalDateTime dueDate;
     // Enum was the choice because a class category is not necessary for a personal project.
     @Column(name = "category")
     @Enumerated(value = EnumType.STRING)
     private TaskCategory taskCategory;
 
-    public Task(String title, String description, LocalDate dueDate, TaskCategory taskCategory) {
+    public Task(String title, String description, LocalDateTime dueDate, TaskCategory taskCategory) {
         this.title = title;
         this.description = description;
         this.taskStatus = TaskStatus.PENDING;

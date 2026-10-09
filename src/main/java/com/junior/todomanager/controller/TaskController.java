@@ -27,8 +27,9 @@ public class TaskController {
     public ResponseEntity<Page<Task>> findAll(Pageable pageable,
                                               @RequestParam(required = false) TaskStatus status,
                                               @RequestParam(required = false) TaskCategory category,
-                                              @RequestParam(required = false) String title) {
-        return ResponseEntity.ok(service.findAll(pageable, status, category, title));
+                                              @RequestParam(required = false) String title,
+                                              @RequestParam(required = false) Boolean overDue) {
+        return ResponseEntity.ok(service.findAll(pageable, status, category, title, overDue));
     }
 
     @GetMapping("/{id}")
