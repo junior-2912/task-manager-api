@@ -30,7 +30,7 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public Page<Task> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overDue) {
+    public Page<Task> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overdue) {
         Specification<Task> specification = Specification.unrestricted();
 
         if (status != null) specification = specification.and(TaskSpecification.hasStatus(status));
@@ -40,9 +40,8 @@ public class TaskService {
         if (title != null && !title.isBlank())
             specification = specification.and(TaskSpecification.titleContains(title));
 
-        if (overDue != null) {
-            if (overDue) specification = specification.and(TaskSpecification.overDue());
-        }
+        if (Boolean.TRUE.equals(overdue)) specification = specification.and(TaskSpecification.overDue());
+
 
         return taskRepository.findAll(specification, pageable);
     }

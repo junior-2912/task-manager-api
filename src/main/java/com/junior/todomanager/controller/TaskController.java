@@ -28,8 +28,8 @@ public class TaskController {
                                               @RequestParam(required = false) TaskStatus status,
                                               @RequestParam(required = false) TaskCategory category,
                                               @RequestParam(required = false) String title,
-                                              @RequestParam(required = false) Boolean overDue) {
-        return ResponseEntity.ok(service.findAll(pageable, status, category, title, overDue));
+                                              @RequestParam(required = false) Boolean overdue) {
+        return ResponseEntity.ok(service.findAll(pageable, status, category, title, overdue));
     }
 
     @GetMapping("/{id}")
