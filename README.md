@@ -211,5 +211,5 @@ Frontend: [junior-2912/taskmanager-frontend](https://github.com/junior-2912/task
 
 ## Author
 
-Developed by Junior (https://github.com/junior-2912) as a personal learning project focused on Java backend development, Spring Boot and relational database integration.
+Developed by Junior ([junior-2912](https://github.com/junior-2912)) as a personal learning project focused on Java backend development, Spring Boot and relational database integration.
 
