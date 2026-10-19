@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 
 class TaskServiceTest {
     @Test
-    void shouldThrowExceptionWhenCannotFoundTaskById() {
+    void findById_shouldThrowExceptionWhenCannotFoundTaskById() {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
@@ -35,7 +35,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWHenDueDateIsBeforeCreateDate() {
+    void saveOrUpdate_shouldThrowExceptionWHenDueDateIsBeforeCreateDate() {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
@@ -48,9 +48,21 @@ class TaskServiceTest {
 
         verify(taskRepository, never()).save(any());
     }
+    @Test
+    void update_shouldThrowExceptionWHenDueDateIsBeforeCreateDate() {
+        TaskRepository taskRepository = mock(TaskRepository.class);
+        TaskService taskService = new TaskService(taskRepository);
+
+        TaskRequestPutDto taskRequestPutDto = new TaskRequestPutDto("Tarefa de teste 2", "Fazendo teste com JUnit", LocalDateTime.parse("2001-01-05T12:00:00"), TaskCategory.PERSONAL);
+
+
+        assertThrows(DateInvalidException.class, () -> taskService.update(taskRequestPutDto, 1000L));
+
+        verify(taskRepository, never()).save(any());
+    }
 
     @Test
-    void shouldThrowExceptionWhenDeletingActiveTask() {
+    void deleteById_shouldThrowExceptionWhenDeletingActiveTask() {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
@@ -65,7 +77,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionInFinishMethodWhenTaskAlreadyFinished() {
+    void finishTak_shouldThrowExceptionWhenTaskAlreadyFinished() {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
@@ -81,7 +93,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionInChangeMethodWhenTaskAlreadyFinished() {
+    void changeTaskStatus_shouldThrowExceptionWhenTaskAlreadyFinished() {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
@@ -97,7 +109,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldFinishTaskSuccessfully() {
+    void finishTask_shouldFinishTaskSuccessfully() {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
@@ -112,7 +124,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldSaveAValidTask() {
+    void save_shouldSaveAValidTask() {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository);
 
