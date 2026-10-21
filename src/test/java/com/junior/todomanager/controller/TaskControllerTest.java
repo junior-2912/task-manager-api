@@ -3,12 +3,17 @@ package com.junior.todomanager.controller;
 import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.dto.TaskRequestPostDto;
 import com.junior.todomanager.dto.TaskRequestPutDto;
+import com.junior.todomanager.dto.TaskStatusRequestDto;
 import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
+import com.junior.todomanager.exceptions.DeleteTaskException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
+import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
 import com.junior.todomanager.services.TaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.PageImpl;
@@ -22,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -124,11 +130,67 @@ class TaskControllerTest {
     }
 
     @Test
-    void deleteById() {
+    void update_mustThrowExceptionWhenIdDoesNotExists() throws Exception {
+        Task task = createValidTask();
+
+
+        when(taskService.update(any(TaskRequestPutDto.class), eq(1L))).thenThrow(ResourceNotFoundException.class);
+
+        TaskRequestPutDto taskRequestPutDto = new TaskRequestPutDto("Tarefa de teste Update", task.getDescription(), task.getDueDate(), task.getTaskCategory());
+        String json = objectMapper.writeValueAsString(taskRequestPutDto);
+
+        mockMvc.perform(put("/tasks/{id}", 1).contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Not found"));
     }
 
     @Test
-    void changeStatus() {
+    void deleteById_mustReturnNoContentWhenSuccessfully() throws Exception {
+        mockMvc.perform(delete("/tasks/{id}", 1L))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteById_mustThrowExceptionWhenTaskIsPendingOrInProgress() throws Exception {
+        Task task = createValidTask();
+
+        doThrow(DeleteTaskException.class)
+                .when(taskService).deleteById(1L);
+
+        mockMvc.perform(delete("/tasks/{id}", 1L))
+                .andExpect(status().isConflict());
+    }
+
+
+    @Test
+    void changeStatus_mustChangeTheStatusWhenSuccessfully() throws Exception {
+        Task task = createValidTask();
+        task.setTaskStatus(TaskStatus.FINISHED);
+
+
+        when(taskService.changeTaskStatus(eq(1L), any(TaskStatusRequestDto.class))).thenReturn(task);
+
+        TaskStatusRequestDto taskStatusRequestDto = new TaskStatusRequestDto(TaskStatus.FINISHED);
+        String json = objectMapper.writeValueAsString(taskStatusRequestDto);
+
+        mockMvc.perform(patch("/tasks/{id}/status", 1).contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.taskStatus").value("FINISHED"));
+    }
+
+    @Test
+    void changeStatus_mustThrowExceptionWhenTaskIsAlreadyFinished() throws Exception {
+        Task task = createValidTask();
+        task.setTaskStatus(TaskStatus.FINISHED);
+
+
+        when(taskService.changeTaskStatus(eq(1L), any(TaskStatusRequestDto.class))).thenThrow(TaskAlreadyFinishedException.class);
+
+        TaskStatusRequestDto taskStatusRequestDto = new TaskStatusRequestDto(TaskStatus.FINISHED);
+        String json = objectMapper.writeValueAsString(taskStatusRequestDto);
+
+        mockMvc.perform(patch("/tasks/{id}/status", 1).contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isConflict());
     }
 
     private static Task createValidTask() {
