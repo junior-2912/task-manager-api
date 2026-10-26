@@ -71,8 +71,6 @@ class TaskControllerTest {
 
     @Test
     void findById_shouldReturn404WhenIdNotFound() throws Exception {
-        Task task = createValidTask();
-
         when(taskService.findById(2L)).thenThrow(ResourceNotFoundException.class);
 
         mockMvc.perform(get("/tasks/{id}", 2))
@@ -152,8 +150,6 @@ class TaskControllerTest {
 
     @Test
     void deleteById_mustThrowExceptionWhenTaskIsPendingOrInProgress() throws Exception {
-        Task task = createValidTask();
-
         doThrow(DeleteTaskException.class)
                 .when(taskService).deleteById(1L);
 

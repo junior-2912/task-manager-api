@@ -1,4 +1,4 @@
-package com.junior.todomanager.exceptions;
+package com.junior.todomanager.exceptionConfig;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
