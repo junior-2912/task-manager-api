@@ -7,6 +7,9 @@ import com.junior.todomanager.dto.TaskResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
@@ -24,4 +27,5 @@ public interface TaskMapper {
     @Mapping(source = "taskStatus", target = "status")
     @Mapping(source = "taskCategory", target = "category")
     TaskResponseDto entityToTaskResponse(Task task);
+
 }

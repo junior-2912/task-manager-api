@@ -32,7 +32,7 @@ public class TaskService {
         this.mapper = mapper;
     }
 
-    public Page<Task> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overdue) {
+    public Page<TaskResponseDto> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overdue) {
         Specification<Task> specification = Specification.unrestricted();
 
         if (status != null) specification = specification.and(TaskSpecification.hasStatus(status));
@@ -45,7 +45,7 @@ public class TaskService {
         if (Boolean.TRUE.equals(overdue)) specification = specification.and(TaskSpecification.overDue());
 
 
-        return taskRepository.findAll(specification, pageable);
+        return taskRepository.findAll(specification, pageable).map(mapper::entityToTaskResponse);
     }
 
     public Task findById(Long id) {

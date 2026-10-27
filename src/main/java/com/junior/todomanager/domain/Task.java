@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -46,6 +45,10 @@ public class Task implements Serializable {
         this.taskStatus = TaskStatus.PENDING;
         this.dueDate = dueDate;
         this.taskCategory = taskCategory;
+    }
+
+    public Task() {
+        this.taskStatus = TaskStatus.PENDING;
     }
 
     public void finishTask() {

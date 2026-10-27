@@ -26,7 +26,7 @@ public class TaskController {
     private final TaskService service;
 
     @GetMapping
-    public ResponseEntity<Page<Task>> findAll(Pageable pageable,
+    public ResponseEntity<Page<TaskResponseDto>> findAll(Pageable pageable,
                                               @RequestParam(required = false) TaskStatus status,
                                               @RequestParam(required = false) TaskCategory category,
                                               @RequestParam(required = false) String title,
