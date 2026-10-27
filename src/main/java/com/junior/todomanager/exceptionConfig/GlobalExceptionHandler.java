@@ -1,4 +1,4 @@
-package com.junior.todomanager.config;
+package com.junior.todomanager.exceptionConfig;
 
 import com.junior.todomanager.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
