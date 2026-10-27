@@ -3,6 +3,7 @@ package com.junior.todomanager.controller;
 import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.dto.TaskRequestPostDto;
 import com.junior.todomanager.dto.TaskRequestPutDto;
+import com.junior.todomanager.dto.TaskResponseDto;
 import com.junior.todomanager.dto.TaskStatusRequestDto;
 import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -38,16 +40,9 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> save(@Valid @RequestBody TaskRequestPostDto taskRequestPostDto) {
-        Task task = service.save(taskRequestPostDto);
-
-        URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(task.getId())
-                .toUri();
-
-        return ResponseEntity.created(uri).body(task);
+    public ResponseEntity<TaskResponseDto> save(@Valid @RequestBody TaskRequestPostDto taskRequestPostDto) {
+        TaskResponseDto task = service.save(taskRequestPostDto);
+        return new ResponseEntity<>(task, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

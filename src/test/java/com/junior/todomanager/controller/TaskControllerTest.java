@@ -9,10 +9,14 @@ import com.junior.todomanager.enums.TaskStatus;
 import com.junior.todomanager.exceptions.DeleteTaskException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
 import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
+import com.junior.todomanager.mapper.TaskMapper;
+import com.junior.todomanager.mapper.TaskMapperImpl;
 import com.junior.todomanager.services.TaskService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -31,7 +35,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@WebMvcTest(TaskController.class)
+@WebMvcTest(controllers = TaskController.class, includeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = TaskMapper.class)
+})
 class TaskControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -42,6 +48,8 @@ class TaskControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private TaskMapper mapper;
 
     @Test
     void findAll_shouldReturn200WhenSuccessfully() throws Exception {
@@ -82,7 +90,7 @@ class TaskControllerTest {
         Task task = createTaskToBeSaved();
         task.setId(1L);
 
-        when(taskService.save(any(TaskRequestPostDto.class))).thenReturn(task);
+        when(taskService.save(any(TaskRequestPostDto.class))).thenReturn(mapper.entityToTaskResponse(task));
 
         TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto(task.getTitle(), task.getDescription(), task.getDueDate(), task.getTaskCategory());
         String json = objectMapper.writeValueAsString(taskRequestPostDto);
@@ -90,8 +98,7 @@ class TaskControllerTest {
         mockMvc.perform(post("/tasks").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.category").exists());
     }
 
     @Test
@@ -99,14 +106,14 @@ class TaskControllerTest {
         Task task = createTaskToBeSaved();
         task.setId(1L);
 
-        when(taskService.save(any(TaskRequestPostDto.class))).thenReturn(task);
+        when(taskService.save(any(TaskRequestPostDto.class))).thenReturn(mapper.entityToTaskResponse(task));
 
         TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto(null, task.getDescription(), task.getDueDate(), task.getTaskCategory());
         String json = objectMapper.writeValueAsString(taskRequestPostDto);
 
         mockMvc.perform(post("/tasks").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.id").doesNotExist());
+                .andExpect(jsonPath("$.category").doesNotExist());
     }
 
     @Test

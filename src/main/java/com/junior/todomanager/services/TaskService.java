@@ -3,6 +3,7 @@ package com.junior.todomanager.services;
 import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.dto.TaskRequestPostDto;
 import com.junior.todomanager.dto.TaskRequestPutDto;
+import com.junior.todomanager.dto.TaskResponseDto;
 import com.junior.todomanager.dto.TaskStatusRequestDto;
 import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
@@ -10,6 +11,7 @@ import com.junior.todomanager.exceptions.DateInvalidException;
 import com.junior.todomanager.exceptions.DeleteTaskException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
 import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
+import com.junior.todomanager.mapper.TaskMapper;
 import com.junior.todomanager.repository.TaskRepository;
 import com.junior.todomanager.specification.TaskSpecification;
 import org.springframework.data.domain.Page;
@@ -18,16 +20,16 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.function.BinaryOperator;
 
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final TaskMapper mapper;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, TaskMapper mapper) {
         this.taskRepository = taskRepository;
+        this.mapper = mapper;
     }
 
     public Page<Task> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overdue) {
@@ -51,16 +53,12 @@ public class TaskService {
     }
 
     @Transactional
-    public Task save(TaskRequestPostDto taskRequestPostDto) {
-        if (taskRequestPostDto.getDueDate() != null && taskRequestPostDto.getDueDate().isBefore(LocalDateTime.now())) {
+    public TaskResponseDto save(TaskRequestPostDto taskRequestPostDto) {
+        Task taskFromMapper = mapper.requestPostToTaskEntity(taskRequestPostDto);
+        if (taskFromMapper.getDueDate() != null && taskFromMapper.getDueDate().isBefore(LocalDateTime.now())) {
             throw new DateInvalidException("Due date cannot be earlier than today");
         }
-        Task task = new Task(taskRequestPostDto.getTitle(),
-                taskRequestPostDto.getDescription(),
-                taskRequestPostDto.getDueDate(),
-                taskRequestPostDto.getTaskCategory());
-
-        return taskRepository.save(task);
+        return mapper.entityToTaskResponse(taskRepository.save(taskFromMapper));
     }
 
     @Transactional
