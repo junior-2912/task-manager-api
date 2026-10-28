@@ -3,6 +3,7 @@ package com.junior.todomanager.controller;
 import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.dto.TaskRequestPostDto;
 import com.junior.todomanager.dto.TaskRequestPutDto;
+import com.junior.todomanager.dto.TaskResponseDto;
 import com.junior.todomanager.dto.TaskStatusRequestDto;
 import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
@@ -53,7 +54,7 @@ class TaskControllerTest {
 
     @Test
     void findAll_shouldReturn200WhenSuccessfully() throws Exception {
-        PageImpl<Task> taskPage = new PageImpl<>(List.of(createValidTask()));
+        PageImpl<TaskResponseDto> taskPage = new PageImpl<>(List.of(createValidTask()).stream().map(mapper::entityToTaskResponse).toList());
 
         when(taskService.findAll(any(Pageable.class), any(), any(), any(), any())).thenReturn(taskPage);
 
@@ -67,12 +68,12 @@ class TaskControllerTest {
     void findById_shouldReturnATaskWhenSuccessfully() throws Exception {
         Task task = createValidTask();
 
-        when(taskService.findById(1L)).thenReturn(task);
+        when(taskService.findById(1L)).thenReturn(mapper.entityToTaskResponse(task));
 
         mockMvc.perform(get("/tasks/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").exists());
+                .andExpect(jsonPath("$.title").exists());
     }
 
     @Test
@@ -121,21 +122,19 @@ class TaskControllerTest {
         Task task = createValidTask();
 
 
-        when(taskService.update(any(TaskRequestPutDto.class), eq(1L))).thenReturn(task);
+        when(taskService.update(any(TaskRequestPutDto.class), eq(1L))).thenReturn(mapper.entityToTaskResponse(task));
 
         TaskRequestPutDto taskRequestPutDto = new TaskRequestPutDto("Tarefa de teste Update", task.getDescription(), task.getDueDate(), task.getTaskCategory());
         String json = objectMapper.writeValueAsString(taskRequestPutDto);
 
         mockMvc.perform(put("/tasks/{id}", 1).contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value(task.getTitle()));
     }
 
     @Test
     void update_mustThrowExceptionWhenIdDoesNotExists() throws Exception {
         Task task = createValidTask();
-
 
         when(taskService.update(any(TaskRequestPutDto.class), eq(1L))).thenThrow(ResourceNotFoundException.class);
 
@@ -169,14 +168,14 @@ class TaskControllerTest {
         task.setTaskStatus(TaskStatus.FINISHED);
 
 
-        when(taskService.changeTaskStatus(eq(1L), any(TaskStatusRequestDto.class))).thenReturn(task);
+        when(taskService.changeTaskStatus(eq(1L), any(TaskStatusRequestDto.class))).thenReturn(mapper.entityToTaskResponse(task));
 
         TaskStatusRequestDto taskStatusRequestDto = new TaskStatusRequestDto(TaskStatus.FINISHED);
         String json = objectMapper.writeValueAsString(taskStatusRequestDto);
 
         mockMvc.perform(patch("/tasks/{id}/status", 1).contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.taskStatus").value("FINISHED"));
+                .andExpect(jsonPath("$.status").value("FINISHED"));
     }
 
     @Test

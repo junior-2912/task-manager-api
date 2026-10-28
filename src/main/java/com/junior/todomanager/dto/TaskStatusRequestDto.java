@@ -1,6 +1,7 @@
 package com.junior.todomanager.dto;
 
 import com.junior.todomanager.enums.TaskStatus;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,5 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskStatusRequestDto {
+    @NotNull
     private TaskStatus status;
 }

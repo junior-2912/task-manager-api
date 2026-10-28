@@ -27,15 +27,15 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<Page<TaskResponseDto>> findAll(Pageable pageable,
-                                              @RequestParam(required = false) TaskStatus status,
-                                              @RequestParam(required = false) TaskCategory category,
-                                              @RequestParam(required = false) String title,
-                                              @RequestParam(required = false) Boolean overdue) {
+                                                         @RequestParam(required = false) TaskStatus status,
+                                                         @RequestParam(required = false) TaskCategory category,
+                                                         @RequestParam(required = false) String title,
+                                                         @RequestParam(required = false) Boolean overdue) {
         return ResponseEntity.ok(service.findAll(pageable, status, category, title, overdue));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Task> findById(@PathVariable Long id) {
+    public ResponseEntity<TaskResponseDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
@@ -46,10 +46,8 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Task> update(@Valid @RequestBody TaskRequestPutDto taskRequestPutDto, @PathVariable Long id) {
-        Task task = service.update(taskRequestPutDto, id);
-
-        return ResponseEntity.ok(task);
+    public ResponseEntity<TaskResponseDto> update(@Valid @RequestBody TaskRequestPutDto taskRequestPutDto, @PathVariable Long id) {
+        return ResponseEntity.ok(service.update(taskRequestPutDto, id));
     }
 
     @DeleteMapping("/{id}")
@@ -59,7 +57,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Task> changeStatus(@PathVariable Long id, @RequestBody TaskStatusRequestDto taskStatusRequestDto) {
+    public ResponseEntity<TaskResponseDto> changeStatus(@PathVariable Long id, @RequestBody @Valid TaskStatusRequestDto taskStatusRequestDto) {
         return ResponseEntity.ok(service.changeTaskStatus(id, taskStatusRequestDto));
     }
 }

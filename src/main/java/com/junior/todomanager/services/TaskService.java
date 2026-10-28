@@ -48,8 +48,8 @@ public class TaskService {
         return taskRepository.findAll(specification, pageable).map(mapper::entityToTaskResponse);
     }
 
-    public Task findById(Long id) {
-        return taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found!"));
+    public TaskResponseDto findById(Long id) {
+        return mapper.entityToTaskResponse(taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found!")));
     }
 
     @Transactional
@@ -62,22 +62,18 @@ public class TaskService {
     }
 
     @Transactional
-    public Task update(TaskRequestPutDto taskRequestPutDto, Long id) {
+    public TaskResponseDto update(TaskRequestPutDto taskRequestPutDto, Long id) {
         if (taskRequestPutDto.getDueDate() != null && taskRequestPutDto.getDueDate().isBefore(LocalDateTime.now())) {
             throw new DateInvalidException("Due date cannot be earlier than today");
         }
-        Task task = findById(id);
-        task.setTitle(taskRequestPutDto.getTitle());
-        task.setDescription(taskRequestPutDto.getDescription());
-        task.setTaskCategory(taskRequestPutDto.getTaskCategory());
-        task.setDueDate(taskRequestPutDto.getDueDate());
-
-        return taskRepository.save(task);
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+        mapper.updateTaskFromDto(taskRequestPutDto, task);
+        return mapper.entityToTaskResponse(taskRepository.save(task));
     }
 
     @Transactional
     public void deleteById(Long id) {
-        Task task = findById(id);
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
         if (task.getTaskStatus().equals(TaskStatus.IN_PROGRESS) || task.getTaskStatus().equals(TaskStatus.PENDING)) {
             throw new DeleteTaskException("Actives task cannot be deleted");
         }
@@ -86,7 +82,7 @@ public class TaskService {
 
     @Transactional
     public void finishTask(Long id) {
-        Task task = findById(id);
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
         if (task.getTaskStatus().equals(TaskStatus.FINISHED) || task.getTaskStatus().equals(TaskStatus.CANCELED)) {
             throw new TaskAlreadyFinishedException("This task has already been finished");
         }
@@ -95,8 +91,8 @@ public class TaskService {
     }
 
     @Transactional
-    public Task changeTaskStatus(Long id, TaskStatusRequestDto taskStatusRequestDto) {
-        Task task = findById(id);
+    public TaskResponseDto changeTaskStatus(Long id, TaskStatusRequestDto taskStatusRequestDto) {
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
         if (task.getTaskStatus().equals(TaskStatus.FINISHED) || task.getTaskStatus().equals(TaskStatus.CANCELED)) {
             throw new TaskAlreadyFinishedException("This task has already been finished");
@@ -108,8 +104,6 @@ public class TaskService {
             task.setTaskStatus(taskStatusRequestDto.getStatus());
         }
 
-        taskRepository.save(task);
-
-        return task;
+        return mapper.entityToTaskResponse(taskRepository.save(task));
     }
 }

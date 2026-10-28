@@ -10,6 +10,7 @@ import com.junior.todomanager.exceptions.DeleteTaskException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
 import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
 import com.junior.todomanager.mapper.TaskMapper;
+import com.junior.todomanager.mapper.TaskMapperImpl;
 import com.junior.todomanager.repository.TaskRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -25,7 +26,8 @@ import static org.mockito.Mockito.*;
 class TaskServiceTest {
 
     @Autowired
-    private TaskMapper mapper;
+    private TaskMapper mapper = new TaskMapperImpl();
+
     @Test
     void findById_shouldThrowExceptionWhenCannotFoundTaskById() {
         TaskRepository taskRepository = mock(TaskRepository.class);
