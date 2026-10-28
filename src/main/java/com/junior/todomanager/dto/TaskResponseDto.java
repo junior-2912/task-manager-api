@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class TaskResponseDto {
     private String title;
+    private String description;
     private TaskStatus status;
     private TaskCategory category;
     private LocalDateTime dueDate;
