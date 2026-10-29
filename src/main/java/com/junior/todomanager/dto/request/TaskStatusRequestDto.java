@@ -1,4 +1,4 @@
-package com.junior.todomanager.dto;
+package com.junior.todomanager.dto.request;
 
 import com.junior.todomanager.enums.TaskStatus;
 import jakarta.validation.constraints.NotNull;

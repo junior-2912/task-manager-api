@@ -1,22 +1,19 @@
-package com.junior.todomanager.dto;
+package com.junior.todomanager.dto.request;
 
 import com.junior.todomanager.enums.TaskCategory;
-import com.junior.todomanager.enums.TaskStatus;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-public class TaskResponseDto {
+@AllArgsConstructor
+public class TaskRequestPutDto {
     private String title;
     private String description;
-    private TaskStatus status;
-    private TaskCategory category;
     private LocalDateTime dueDate;
+
+    private TaskCategory taskCategory;
 }

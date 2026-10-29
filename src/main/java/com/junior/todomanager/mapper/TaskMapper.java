@@ -1,9 +1,9 @@
 package com.junior.todomanager.mapper;
 
 import com.junior.todomanager.domain.Task;
-import com.junior.todomanager.dto.TaskRequestPostDto;
-import com.junior.todomanager.dto.TaskRequestPutDto;
-import com.junior.todomanager.dto.TaskResponseDto;
+import com.junior.todomanager.dto.request.TaskRequestPostDto;
+import com.junior.todomanager.dto.request.TaskRequestPutDto;
+import com.junior.todomanager.dto.response.TaskResponseDto;
 import org.mapstruct.*;
 
 

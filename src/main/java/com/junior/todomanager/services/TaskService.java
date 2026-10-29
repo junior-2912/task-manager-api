@@ -1,10 +1,10 @@
 package com.junior.todomanager.services;
 
 import com.junior.todomanager.domain.Task;
-import com.junior.todomanager.dto.TaskRequestPostDto;
-import com.junior.todomanager.dto.TaskRequestPutDto;
-import com.junior.todomanager.dto.TaskResponseDto;
-import com.junior.todomanager.dto.TaskStatusRequestDto;
+import com.junior.todomanager.dto.request.TaskRequestPostDto;
+import com.junior.todomanager.dto.request.TaskRequestPutDto;
+import com.junior.todomanager.dto.response.TaskResponseDto;
+import com.junior.todomanager.dto.request.TaskStatusRequestDto;
 import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
 import com.junior.todomanager.exceptions.DateInvalidException;

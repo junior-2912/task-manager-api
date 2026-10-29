@@ -1,10 +1,9 @@
 package com.junior.todomanager.controller;
 
-import com.junior.todomanager.domain.Task;
-import com.junior.todomanager.dto.TaskRequestPostDto;
-import com.junior.todomanager.dto.TaskRequestPutDto;
-import com.junior.todomanager.dto.TaskResponseDto;
-import com.junior.todomanager.dto.TaskStatusRequestDto;
+import com.junior.todomanager.dto.request.TaskRequestPostDto;
+import com.junior.todomanager.dto.request.TaskRequestPutDto;
+import com.junior.todomanager.dto.response.TaskResponseDto;
+import com.junior.todomanager.dto.request.TaskStatusRequestDto;
 import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
 import com.junior.todomanager.services.TaskService;
@@ -15,9 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.net.URI;
 
 @RequiredArgsConstructor
 @RequestMapping("/tasks")

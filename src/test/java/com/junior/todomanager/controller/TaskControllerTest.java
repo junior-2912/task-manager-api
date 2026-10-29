@@ -1,17 +1,16 @@
 package com.junior.todomanager.controller;
 
 import com.junior.todomanager.domain.Task;
-import com.junior.todomanager.dto.TaskRequestPostDto;
-import com.junior.todomanager.dto.TaskRequestPutDto;
-import com.junior.todomanager.dto.TaskResponseDto;
-import com.junior.todomanager.dto.TaskStatusRequestDto;
+import com.junior.todomanager.dto.request.TaskRequestPostDto;
+import com.junior.todomanager.dto.request.TaskRequestPutDto;
+import com.junior.todomanager.dto.response.TaskResponseDto;
+import com.junior.todomanager.dto.request.TaskStatusRequestDto;
 import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
 import com.junior.todomanager.exceptions.DeleteTaskException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
 import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
 import com.junior.todomanager.mapper.TaskMapper;
-import com.junior.todomanager.mapper.TaskMapperImpl;
 import com.junior.todomanager.services.TaskService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
