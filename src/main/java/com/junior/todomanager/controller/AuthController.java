@@ -5,16 +5,15 @@ import com.junior.todomanager.dto.request.LoginRequestDto;
 import com.junior.todomanager.dto.request.RegisterUserRequestDto;
 import com.junior.todomanager.dto.response.LoginResponseDto;
 import com.junior.todomanager.dto.response.RegisterUserResponseDto;
-import com.junior.todomanager.enums.UserRole;
 import com.junior.todomanager.repository.UserRepository;
-import com.junior.todomanager.security.TokenConfig;
+import com.junior.todomanager.security.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,15 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
     private final UserRepository userRepository;
-    private final PasswordEncoder encoder;
     private final AuthenticationManager authenticationManager;
-    private final TokenConfig tokenConfig;
+    private final TokenService tokenService;
 
-    public AuthController(UserRepository userRepository, PasswordEncoder encoder, AuthenticationManager authenticationManager, TokenConfig tokenConfig) {
+    public AuthController(UserRepository userRepository, AuthenticationManager authenticationManager, TokenService tokenService) {
         this.userRepository = userRepository;
-        this.encoder = encoder;
         this.authenticationManager = authenticationManager;
-        this.tokenConfig = tokenConfig;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/login")
@@ -41,19 +38,20 @@ public class AuthController {
         Authentication authenticate = authenticationManager.authenticate(userAndPassword);
 
         User user = (User) authenticate.getPrincipal();
-        String token = tokenConfig.generateToken(user);
+        String token = tokenService.generateToken(user);
 
         return ResponseEntity.ok(new LoginResponseDto(token));
     }
 
     @PostMapping("/register")
     public ResponseEntity<RegisterUserResponseDto> register(@RequestBody @Valid RegisterUserRequestDto request) {
+        if (userRepository.findByEmail(request.email()).isPresent()) return ResponseEntity.badRequest().build();
         User user = new User();
 
         user.setName(request.name());
         user.setEmail(request.email());
-        user.setPassword(encoder.encode(request.password()));
-        user.setRole(UserRole.USER);
+        user.setPassword(new BCryptPasswordEncoder().encode(request.password()));
+        user.setRole(request.role());
 
         userRepository.save(user);
 

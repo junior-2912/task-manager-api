@@ -2,29 +2,36 @@ package com.junior.todomanager.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.junior.todomanager.domain.User;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Optional;
 
-@Component
-public class TokenConfig {
-    private String secret = "secret";
+@Service
+public class TokenService {
+    @Value("${api.security.token.secret}")
+    private String secret;
 
     public String generateToken(User user) {
-        if (user == null) throw new ResourceNotFoundException("User cannot be null");
-        Algorithm algorithm = Algorithm.HMAC256(secret);
+        try {
+            if (user == null) throw new ResourceNotFoundException("User cannot be null");
+            Algorithm algorithm = Algorithm.HMAC256(secret);
 
-        return JWT.create()
-                .withClaim("userId", user.getId())
-                .withSubject(user.getEmail())
-                .withExpiresAt(Instant.now().plusSeconds(120000))
-                .withIssuedAt(Instant.now())
-                .sign(algorithm);
+            return JWT.create()
+                    .withClaim("userId", user.getId())
+                    .withSubject(user.getEmail())
+                    .withExpiresAt(Instant.now().plusSeconds(120000))
+                    .withIssuedAt(Instant.now())
+                    .sign(algorithm);
+        } catch (JWTCreationException e) {
+            throw new RuntimeException("Error while generating token", e);
+        }
     }
 
     public Optional<JWTUserData> validateToken(String token) {
