@@ -5,6 +5,7 @@ import com.junior.todomanager.dto.request.LoginRequestDto;
 import com.junior.todomanager.dto.request.RegisterUserRequestDto;
 import com.junior.todomanager.dto.response.LoginResponseDto;
 import com.junior.todomanager.dto.response.RegisterUserResponseDto;
+import com.junior.todomanager.enums.UserRole;
 import com.junior.todomanager.repository.UserRepository;
 import com.junior.todomanager.security.TokenService;
 import jakarta.validation.Valid;
@@ -51,7 +52,7 @@ public class AuthController {
         user.setName(request.name());
         user.setEmail(request.email());
         user.setPassword(new BCryptPasswordEncoder().encode(request.password()));
-        user.setRole(request.role());
+        user.setRole(UserRole.USER);
 
         userRepository.save(user);
 
