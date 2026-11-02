@@ -28,6 +28,7 @@ public class User implements UserDetails {
     private String email;
     @Column(nullable = false)
     private String password;
+    // TODO - remover roles, as roles trazem uma complexidade a mais e creio que nesse projeto nao tem uma utilidade tao grande.
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
