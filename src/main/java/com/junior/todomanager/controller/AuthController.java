@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,11 +27,13 @@ public class AuthController {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UserRepository userRepository, AuthenticationManager authenticationManager, TokenService tokenService) {
+    public AuthController(UserRepository userRepository, AuthenticationManager authenticationManager, TokenService tokenService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")
@@ -51,7 +54,7 @@ public class AuthController {
 
         user.setName(request.name());
         user.setEmail(request.email());
-        user.setPassword(new BCryptPasswordEncoder().encode(request.password()));
+        user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(UserRole.USER);
 
         userRepository.save(user);

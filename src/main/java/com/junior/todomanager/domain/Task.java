@@ -39,12 +39,16 @@ public class Task implements Serializable {
     @Enumerated(value = EnumType.STRING)
     private TaskCategory taskCategory;
 
-    public Task(String title, String description, LocalDateTime dueDate, TaskCategory taskCategory) {
+    @ManyToOne
+    private User user;
+
+    public Task(String title, String description, LocalDateTime dueDate, TaskCategory taskCategory, User user) {
         this.title = title;
         this.description = description;
         this.taskStatus = TaskStatus.PENDING;
         this.dueDate = dueDate;
         this.taskCategory = taskCategory;
+        this.user = user;
     }
 
     public Task() {
