@@ -1,12 +1,15 @@
 package com.junior.todomanager.security;
 
+import com.junior.todomanager.services.AuthorizationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -16,9 +19,11 @@ import java.util.Optional;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
+    private final AuthorizationService authorizationService;
 
-    public SecurityFilter(TokenService tokenService) {
+    public SecurityFilter(TokenService tokenService, AuthorizationService authorizationService) {
         this.tokenService = tokenService;
+        this.authorizationService = authorizationService;
     }
 
     @Override
@@ -30,13 +35,14 @@ public class SecurityFilter extends OncePerRequestFilter {
 
             if (optUser.isPresent()) {
                 JWTUserData userData = optUser.get();
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userData, null, null);
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
-            filterChain.doFilter(request, response);
+                UserDetails userDetails = authorizationService.loadUserByUsername(userData.email());
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-        } else {
-            filterChain.doFilter(request, response);
+                SecurityContext context = SecurityContextHolder.createEmptyContext();
+                context.setAuthentication(authenticationToken);
+                SecurityContextHolder.setContext(context);
+            }
         }
+        filterChain.doFilter(request, response);
     }
 }

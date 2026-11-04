@@ -25,6 +25,7 @@ public class TokenService {
 
             return JWT.create()
                     .withClaim("userId", user.getId())
+                    .withIssuer("task-manager-api")
                     .withSubject(user.getEmail())
                     .withExpiresAt(Instant.now().plusSeconds(1200))
                     .withIssuedAt(Instant.now())

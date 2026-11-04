@@ -5,7 +5,6 @@ import com.junior.todomanager.dto.request.LoginRequestDto;
 import com.junior.todomanager.dto.request.RegisterUserRequestDto;
 import com.junior.todomanager.dto.response.LoginResponseDto;
 import com.junior.todomanager.dto.response.RegisterUserResponseDto;
-import com.junior.todomanager.enums.UserRole;
 import com.junior.todomanager.repository.UserRepository;
 import com.junior.todomanager.security.TokenService;
 import jakarta.validation.Valid;
@@ -14,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,7 +53,6 @@ public class AuthController {
         user.setName(request.name());
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
-        user.setRole(UserRole.USER);
 
         userRepository.save(user);
 

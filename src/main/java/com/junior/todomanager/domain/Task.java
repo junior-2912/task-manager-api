@@ -39,7 +39,7 @@ public class Task implements Serializable {
     @Enumerated(value = EnumType.STRING)
     private TaskCategory taskCategory;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     public Task(String title, String description, LocalDateTime dueDate, TaskCategory taskCategory, User user) {

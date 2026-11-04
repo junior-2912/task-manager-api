@@ -1,10 +1,8 @@
 package com.junior.todomanager.domain;
 
-import com.junior.todomanager.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -28,14 +26,10 @@ public class User implements UserDetails {
     private String email;
     @Column(nullable = false)
     private String password;
-    // TODO - remover roles, as roles trazem uma complexidade a mais e creio que nesse projeto nao tem uma utilidade tao grande.
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.role == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
-        else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of();
     }
 
     @Override
