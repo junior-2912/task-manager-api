@@ -40,6 +40,7 @@ public class Task implements Serializable {
     private TaskCategory taskCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Task(String title, String description, LocalDateTime dueDate, TaskCategory taskCategory, User user) {

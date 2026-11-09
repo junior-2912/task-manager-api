@@ -1,6 +1,7 @@
 package com.junior.todomanager.services;
 
 import com.junior.todomanager.domain.Task;
+import com.junior.todomanager.domain.User;
 import com.junior.todomanager.dto.request.TaskRequestPostDto;
 import com.junior.todomanager.dto.request.TaskRequestPutDto;
 import com.junior.todomanager.enums.TaskCategory;
@@ -33,7 +34,8 @@ class TaskServiceTest {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository, mapper);
 
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
+        User user = new User(1L, "Usuario de teste", "teste@email.com", "secreta");
+        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
         task.setId(1000L);
 
         when(taskRepository.findById(1000L)).thenReturn(Optional.of(task));
@@ -73,7 +75,8 @@ class TaskServiceTest {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository, mapper);
 
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
+        User user = new User(1L, "Usuario de teste", "teste@email.com", "secreta");
+        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
         task.setId(1000L);
 
         when(taskRepository.findById(1000L)).thenReturn(Optional.of(task));
@@ -88,7 +91,8 @@ class TaskServiceTest {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository, mapper);
 
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
+        User user = new User(1L, "Usuario de teste", "teste@email.com", "secreta");
+        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
         task.setId(1000L);
         task.setTaskStatus(TaskStatus.FINISHED);
 
@@ -104,7 +108,8 @@ class TaskServiceTest {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository, mapper);
 
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
+        User user = new User(1L, "Usuario de teste", "teste@email.com", "secreta");
+        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
         task.setId(1000L);
         task.setTaskStatus(TaskStatus.FINISHED);
 
@@ -120,7 +125,8 @@ class TaskServiceTest {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository, mapper);
 
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
+        User user = new User(1L, "Usuario de teste", "teste@email.com", "secreta");
+        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
         task.setId(1000L);
 
         when(taskRepository.findById(1000L)).thenReturn(Optional.of(task));

@@ -1,6 +1,7 @@
 package com.junior.todomanager.controller;
 
 import com.junior.todomanager.domain.Task;
+import com.junior.todomanager.domain.User;
 import com.junior.todomanager.dto.request.TaskRequestPostDto;
 import com.junior.todomanager.dto.request.TaskRequestPutDto;
 import com.junior.todomanager.dto.response.TaskResponseDto;
@@ -55,7 +56,7 @@ class TaskControllerTest {
     void findAll_shouldReturn200WhenSuccessfully() throws Exception {
         PageImpl<TaskResponseDto> taskPage = new PageImpl<>(List.of(createValidTask()).stream().map(mapper::entityToTaskResponse).toList());
 
-        when(taskService.findAll(any(Pageable.class), any(), any(), any(), any())).thenReturn(taskPage);
+        when(taskService.findAll(any(Pageable.class), any(), any(), any(), any(), any())).thenReturn(taskPage);
 
         mockMvc.perform(get("/tasks"))
                 .andExpect(status().isOk())
@@ -197,13 +198,15 @@ class TaskControllerTest {
                 "Fazendo teste com JUnit",
                 TaskStatus.PENDING,
                 LocalDateTime.parse("2027-01-05T12:00:00"),
-                TaskCategory.PERSONAL);
+                TaskCategory.PERSONAL,
+                new User(1L, "Usuario de teste", "teste@email.com", "secreta"));
     }
 
     private static Task createTaskToBeSaved() {
         return new Task("Tarefa de teste 1",
                 "Fazendo teste com JUnit",
                 LocalDateTime.parse("2027-01-05T12:00:00"),
-                TaskCategory.PERSONAL);
+                TaskCategory.PERSONAL,
+                new User(1L, "Usuario de teste", "teste@email.com", "secreta"));
     }
 }

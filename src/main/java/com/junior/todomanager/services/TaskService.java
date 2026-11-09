@@ -32,7 +32,7 @@ public class TaskService {
         this.mapper = mapper;
     }
 
-    public Page<TaskResponseDto> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overdue) {
+    public Page<TaskResponseDto> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overdue, Long userId) {
         Specification<Task> specification = Specification.unrestricted();
 
         if (status != null) specification = specification.and(TaskSpecification.hasStatus(status));
