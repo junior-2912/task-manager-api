@@ -1,6 +1,5 @@
 package com.junior.todomanager.security;
 
-import com.junior.todomanager.domain.User;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

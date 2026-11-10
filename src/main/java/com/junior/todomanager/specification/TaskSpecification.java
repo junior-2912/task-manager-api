@@ -50,4 +50,12 @@ public class TaskSpecification {
                         criteriaBuilder.notEqual(root.get("taskStatus"), TaskStatus.CANCELED)
                 );
     }
+
+    public static Specification<Task> withUserId(Long userId) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(
+                        root.get("user").get("id"),
+                        userId
+                );
+    }
 }

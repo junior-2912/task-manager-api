@@ -56,7 +56,7 @@ class TaskControllerTest {
     void findAll_shouldReturn200WhenSuccessfully() throws Exception {
         PageImpl<TaskResponseDto> taskPage = new PageImpl<>(List.of(createValidTask()).stream().map(mapper::entityToTaskResponse).toList());
 
-        when(taskService.findAll(any(Pageable.class), any(), any(), any(), any(), any())).thenReturn(taskPage);
+        when(taskService.findAll(any(Pageable.class), any(), any(), any(), any())).thenReturn(taskPage);
 
         mockMvc.perform(get("/tasks"))
                 .andExpect(status().isOk())

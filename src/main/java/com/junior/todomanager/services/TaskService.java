@@ -14,6 +14,8 @@ import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
 import com.junior.todomanager.mapper.TaskMapper;
 import com.junior.todomanager.repository.TaskRepository;
 import com.junior.todomanager.specification.TaskSpecification;
+import com.junior.todomanager.util.AuthenticatedUserProvider;
+import org.hibernate.internal.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,12 +29,15 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper mapper;
 
-    public TaskService(TaskRepository taskRepository, TaskMapper mapper) {
+    private final AuthenticatedUserProvider authenticatedUserProvider;
+
+    public TaskService(TaskRepository taskRepository, TaskMapper mapper, AuthenticatedUserProvider authenticatedUserProvider) {
         this.taskRepository = taskRepository;
         this.mapper = mapper;
+        this.authenticatedUserProvider = authenticatedUserProvider;
     }
 
-    public Page<TaskResponseDto> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overdue, Long userId) {
+    public Page<TaskResponseDto> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overdue) {
         Specification<Task> specification = Specification.unrestricted();
 
         if (status != null) specification = specification.and(TaskSpecification.hasStatus(status));
@@ -44,12 +49,13 @@ public class TaskService {
 
         if (Boolean.TRUE.equals(overdue)) specification = specification.and(TaskSpecification.overDue());
 
+        specification = specification.and(TaskSpecification.withUserId(authenticatedUserProvider.getAuthenticatedUser().getId()));
 
         return taskRepository.findAll(specification, pageable).map(mapper::entityToTaskResponse);
     }
 
     public TaskResponseDto findById(Long id) {
-        return mapper.entityToTaskResponse(taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found!")));
+        return mapper.entityToTaskResponse(taskRepository.findByIdAndUserId(id, authenticatedUserProvider.getAuthenticatedUser().getId()).orElseThrow(() -> new ResourceNotFoundException("Task not found")));
     }
 
     @Transactional
