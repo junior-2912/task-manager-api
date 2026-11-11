@@ -1,6 +1,7 @@
 package com.junior.todomanager.mapper;
 
 import com.junior.todomanager.domain.Task;
+import com.junior.todomanager.domain.User;
 import com.junior.todomanager.dto.request.TaskRequestPostDto;
 import com.junior.todomanager.dto.request.TaskRequestPutDto;
 import com.junior.todomanager.dto.response.TaskResponseDto;
@@ -11,11 +12,8 @@ import org.mapstruct.*;
 public interface TaskMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "taskStatus", ignore = true)
-    Task requestPostToTaskEntity(TaskRequestPostDto taskRequestPostDto);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "taskStatus", ignore = true)
-    Task requestPutToTaskEntity(TaskRequestPutDto taskRequestPutDto);
+    @Mapping(target = "user", source = "user")
+    Task requestPostToTaskEntity(TaskRequestPostDto taskRequestPostDto, User user);
 
     @Mapping(source = "taskStatus", target = "status")
     @Mapping(source = "taskCategory", target = "category")
@@ -23,6 +21,7 @@ public interface TaskMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "taskStatus", ignore = true)
+    @Mapping(target = "user", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateTaskFromDto(TaskRequestPutDto taskRequestPutDto, @MappingTarget Task entity);
 }

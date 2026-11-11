@@ -60,7 +60,7 @@ public class TaskService {
 
     @Transactional
     public TaskResponseDto save(TaskRequestPostDto taskRequestPostDto) {
-        Task taskFromMapper = mapper.requestPostToTaskEntity(taskRequestPostDto);
+        Task taskFromMapper = mapper.requestPostToTaskEntity(taskRequestPostDto, authenticatedUserProvider.getAuthenticatedUser());
         if (taskFromMapper.getDueDate() != null && taskFromMapper.getDueDate().isBefore(LocalDateTime.now())) {
             throw new DateInvalidException("Due date cannot be earlier than today");
         }
