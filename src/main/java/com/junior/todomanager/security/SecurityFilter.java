@@ -1,6 +1,6 @@
 package com.junior.todomanager.security;
 
-import com.junior.todomanager.services.AuthorizationService;
+import com.junior.todomanager.services.UserAuthenticationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,11 +19,11 @@ import java.util.Optional;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
-    private final AuthorizationService authorizationService;
+    private final UserAuthenticationService userAuthenticationService;
 
-    public SecurityFilter(TokenService tokenService, AuthorizationService authorizationService) {
+    public SecurityFilter(TokenService tokenService, UserAuthenticationService userAuthenticationService) {
         this.tokenService = tokenService;
-        this.authorizationService = authorizationService;
+        this.userAuthenticationService = userAuthenticationService;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
             if (optUser.isPresent()) {
                 JWTUserData userData = optUser.get();
-                UserDetails userDetails = authorizationService.loadUserByUsername(userData.email());
+                UserDetails userDetails = userAuthenticationService.loadUserByUsername(userData.email());
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                 SecurityContext context = SecurityContextHolder.createEmptyContext();

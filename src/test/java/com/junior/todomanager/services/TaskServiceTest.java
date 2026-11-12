@@ -3,7 +3,8 @@ package com.junior.todomanager.services;
 import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.domain.User;
 import com.junior.todomanager.dto.request.TaskRequestPostDto;
-import com.junior.todomanager.dto.request.TaskRequestPutDto;
+import com.junior.todomanager.dto.request.TaskRequestPatchDto;
+import com.junior.todomanager.dto.response.TaskResponseDto;
 import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
 import com.junior.todomanager.exceptions.DateInvalidException;
@@ -11,11 +12,10 @@ import com.junior.todomanager.exceptions.DeleteTaskException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
 import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
 import com.junior.todomanager.mapper.TaskMapper;
-import com.junior.todomanager.mapper.TaskMapperImpl;
 import com.junior.todomanager.repository.TaskRepository;
+import com.junior.todomanager.util.AuthenticatedUserProvider;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -26,13 +26,28 @@ import static org.mockito.Mockito.*;
 
 class TaskServiceTest {
 
-    @Autowired
-    private TaskMapper mapper = new TaskMapperImpl();
+    private TaskMapper mapper = new TaskMapper() {
+        @Override
+        public Task requestPostToTaskEntity(TaskRequestPostDto taskRequestPostDto, User user) {
+            return null;
+        }
 
+        @Override
+        public TaskResponseDto entityToTaskResponse(Task task) {
+            return null;
+        }
+
+        @Override
+        public void updateTaskFromDto(TaskRequestPatchDto taskRequestPatchDto, Task entity) {
+
+        }
+    };
+
+    private AuthenticatedUserProvider authenticatedUserProvider =  new AuthenticatedUserProvider();
     @Test
     void findById_shouldThrowExceptionWhenCannotFoundTaskById() {
         TaskRepository taskRepository = mock(TaskRepository.class);
-        TaskService taskService = new TaskService(taskRepository, mapper);
+        TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
         User user = new User(1L, "Usuario de teste", "teste@email.com", "secreta");
         Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
@@ -46,26 +61,26 @@ class TaskServiceTest {
     @Test
     void saveOrUpdate_shouldThrowExceptionWHenDueDateIsBeforeCreateDate() {
         TaskRepository taskRepository = mock(TaskRepository.class);
-        TaskService taskService = new TaskService(taskRepository, mapper);
+        TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
         TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
-        TaskRequestPutDto taskRequestPutDto = new TaskRequestPutDto("Tarefa de teste 2", "Fazendo teste com JUnit", LocalDateTime.parse("2001-01-05T12:00:00"), TaskCategory.PERSONAL);
+        TaskRequestPatchDto taskRequestPatchDto = new TaskRequestPatchDto("Tarefa de teste 2", "Fazendo teste com JUnit", LocalDateTime.parse("2001-01-05T12:00:00"), TaskCategory.PERSONAL);
 
 
         assertThrows(DateInvalidException.class, () -> taskService.save(taskRequestPostDto));
-        assertThrows(DateInvalidException.class, () -> taskService.update(taskRequestPutDto, 1000L));
+        assertThrows(DateInvalidException.class, () -> taskService.patch(taskRequestPatchDto, 1000L));
 
         verify(taskRepository, never()).save(any());
     }
     @Test
     void update_shouldThrowExceptionWHenDueDateIsBeforeCreateDate() {
         TaskRepository taskRepository = mock(TaskRepository.class);
-        TaskService taskService = new TaskService(taskRepository, mapper);
+        TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
-        TaskRequestPutDto taskRequestPutDto = new TaskRequestPutDto("Tarefa de teste 2", "Fazendo teste com JUnit", LocalDateTime.parse("2001-01-05T12:00:00"), TaskCategory.PERSONAL);
+        TaskRequestPatchDto taskRequestPatchDto = new TaskRequestPatchDto("Tarefa de teste 2", "Fazendo teste com JUnit", LocalDateTime.parse("2001-01-05T12:00:00"), TaskCategory.PERSONAL);
 
 
-        assertThrows(DateInvalidException.class, () -> taskService.update(taskRequestPutDto, 1000L));
+        assertThrows(DateInvalidException.class, () -> taskService.patch(taskRequestPatchDto, 1000L));
 
         verify(taskRepository, never()).save(any());
     }
@@ -73,7 +88,7 @@ class TaskServiceTest {
     @Test
     void deleteById_shouldThrowExceptionWhenDeletingActiveTask() {
         TaskRepository taskRepository = mock(TaskRepository.class);
-        TaskService taskService = new TaskService(taskRepository, mapper);
+        TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
         User user = new User(1L, "Usuario de teste", "teste@email.com", "secreta");
         Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
@@ -89,7 +104,7 @@ class TaskServiceTest {
     @Test
     void finishTak_shouldThrowExceptionWhenTaskAlreadyFinished() {
         TaskRepository taskRepository = mock(TaskRepository.class);
-        TaskService taskService = new TaskService(taskRepository, mapper);
+        TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
         User user = new User(1L, "Usuario de teste", "teste@email.com", "secreta");
         Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
@@ -106,7 +121,7 @@ class TaskServiceTest {
     @Test
     void changeTaskStatus_shouldThrowExceptionWhenTaskAlreadyFinished() {
         TaskRepository taskRepository = mock(TaskRepository.class);
-        TaskService taskService = new TaskService(taskRepository, mapper);
+        TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
         User user = new User(1L, "Usuario de teste", "teste@email.com", "secreta");
         Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
@@ -123,7 +138,7 @@ class TaskServiceTest {
     @Test
     void finishTask_shouldFinishTaskSuccessfully() {
         TaskRepository taskRepository = mock(TaskRepository.class);
-        TaskService taskService = new TaskService(taskRepository, mapper);
+        TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
         User user = new User(1L, "Usuario de teste", "teste@email.com", "secreta");
         Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
@@ -139,7 +154,7 @@ class TaskServiceTest {
     @Test
     void save_shouldSaveAValidTask() {
         TaskRepository taskRepository = mock(TaskRepository.class);
-        TaskService taskService = new TaskService(taskRepository, mapper);
+        TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
         TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto("Tarefa de teste 1",
                 "Fazendo teste com JUnit",

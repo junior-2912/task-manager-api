@@ -1,19 +1,13 @@
 package com.junior.todomanager.dto.request;
 
 import com.junior.todomanager.enums.TaskCategory;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.junior.todomanager.enums.TaskStatus;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class TaskRequestPutDto {
-    private String title;
-    private String description;
-    private LocalDateTime dueDate;
-
-    private TaskCategory taskCategory;
+public record TaskRequestPutDto(@NotBlank String title, @NotBlank String description, @NotEmpty TaskStatus taskStatus,
+                                @NotNull LocalDateTime dueDate , @NotEmpty TaskCategory taskCategory) {
 }

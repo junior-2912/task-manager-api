@@ -2,6 +2,7 @@ package com.junior.todomanager.services;
 
 import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.dto.request.TaskRequestPostDto;
+import com.junior.todomanager.dto.request.TaskRequestPatchDto;
 import com.junior.todomanager.dto.request.TaskRequestPutDto;
 import com.junior.todomanager.dto.response.TaskResponseDto;
 import com.junior.todomanager.dto.request.TaskStatusRequestDto;
@@ -15,26 +16,28 @@ import com.junior.todomanager.mapper.TaskMapper;
 import com.junior.todomanager.repository.TaskRepository;
 import com.junior.todomanager.specification.TaskSpecification;
 import com.junior.todomanager.util.AuthenticatedUserProvider;
-import org.hibernate.internal.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.repository.core.support.RepositoryMethodInvocationListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper mapper;
-
     private final AuthenticatedUserProvider authenticatedUserProvider;
+    private final RepositoryMethodInvocationListener repositoryMethodInvocationListener;
 
-    public TaskService(TaskRepository taskRepository, TaskMapper mapper, AuthenticatedUserProvider authenticatedUserProvider) {
+    public TaskService(TaskRepository taskRepository, TaskMapper mapper, AuthenticatedUserProvider authenticatedUserProvider, RepositoryMethodInvocationListener repositoryMethodInvocationListener) {
         this.taskRepository = taskRepository;
         this.mapper = mapper;
         this.authenticatedUserProvider = authenticatedUserProvider;
+        this.repositoryMethodInvocationListener = repositoryMethodInvocationListener;
     }
 
     public Page<TaskResponseDto> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overdue) {
@@ -68,13 +71,20 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponseDto update(TaskRequestPutDto taskRequestPutDto, Long id) {
-        if (taskRequestPutDto.getDueDate() != null && taskRequestPutDto.getDueDate().isBefore(LocalDateTime.now())) {
+    public TaskResponseDto patch(TaskRequestPatchDto taskRequestPatchDto, Long id) {
+        if (taskRequestPatchDto.getDueDate() != null && taskRequestPatchDto.getDueDate().isBefore(LocalDateTime.now())) {
             throw new DateInvalidException("Due date cannot be earlier than today");
         }
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
-        mapper.updateTaskFromDto(taskRequestPutDto, task);
+        Task task = taskRepository.findByIdAndUserId(id, authenticatedUserProvider.getAuthenticatedUser().getId()).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+        mapper.updateTaskFromDto(taskRequestPatchDto, task);
         return mapper.entityToTaskResponse(taskRepository.save(task));
+    }
+
+    @Transactional
+    public TaskResponseDto replace(TaskRequestPutDto taskRequestPutDto, Long id) {
+        Task taskPersisted = taskRepository.findByIdAndUserId(id, authenticatedUserProvider.getAuthenticatedUser().getId()).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+        mapper.replaceTaskFromDto(taskRequestPutDto, taskPersisted);
+        return mapper.entityToTaskResponse(taskRepository.save(taskPersisted));
     }
 
     @Transactional

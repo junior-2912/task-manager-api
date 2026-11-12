@@ -1,7 +1,8 @@
 package com.junior.todomanager.controller;
 
-import com.junior.todomanager.dto.request.TaskRequestPostDto;
 import com.junior.todomanager.dto.request.TaskRequestPutDto;
+import com.junior.todomanager.dto.request.TaskRequestPostDto;
+import com.junior.todomanager.dto.request.TaskRequestPatchDto;
 import com.junior.todomanager.dto.response.TaskResponseDto;
 import com.junior.todomanager.dto.request.TaskStatusRequestDto;
 import com.junior.todomanager.enums.TaskCategory;
@@ -41,9 +42,14 @@ public class TaskController {
         return new ResponseEntity<>(task, HttpStatus.CREATED);
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<TaskResponseDto> patch(@RequestBody TaskRequestPatchDto taskRequestPatchDto, @PathVariable Long id) {
+        return ResponseEntity.ok(service.patch(taskRequestPatchDto, id));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<TaskResponseDto> update(@Valid @RequestBody TaskRequestPutDto taskRequestPutDto, @PathVariable Long id) {
-        return ResponseEntity.ok(service.update(taskRequestPutDto, id));
+    public ResponseEntity<TaskResponseDto> replace(@PathVariable Long id, @Valid TaskRequestPutDto taskRequestPutDto) {
+        return ;
     }
 
     @DeleteMapping("/{id}")

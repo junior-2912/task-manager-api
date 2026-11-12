@@ -3,7 +3,7 @@ package com.junior.todomanager.controller;
 import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.domain.User;
 import com.junior.todomanager.dto.request.TaskRequestPostDto;
-import com.junior.todomanager.dto.request.TaskRequestPutDto;
+import com.junior.todomanager.dto.request.TaskRequestPatchDto;
 import com.junior.todomanager.dto.response.TaskResponseDto;
 import com.junior.todomanager.dto.request.TaskStatusRequestDto;
 import com.junior.todomanager.enums.TaskCategory;
@@ -122,10 +122,10 @@ class TaskControllerTest {
         Task task = createValidTask();
 
 
-        when(taskService.update(any(TaskRequestPutDto.class), eq(1L))).thenReturn(mapper.entityToTaskResponse(task));
+        when(taskService.patch(any(TaskRequestPatchDto.class), eq(1L))).thenReturn(mapper.entityToTaskResponse(task));
 
-        TaskRequestPutDto taskRequestPutDto = new TaskRequestPutDto("Tarefa de teste Update", task.getDescription(), task.getDueDate(), task.getTaskCategory());
-        String json = objectMapper.writeValueAsString(taskRequestPutDto);
+        TaskRequestPatchDto taskRequestPatchDto = new TaskRequestPatchDto("Tarefa de teste Update", task.getDescription(), task.getDueDate(), task.getTaskCategory());
+        String json = objectMapper.writeValueAsString(taskRequestPatchDto);
 
         mockMvc.perform(put("/tasks/{id}", 1).contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isOk())
@@ -136,10 +136,10 @@ class TaskControllerTest {
     void update_mustThrowExceptionWhenIdDoesNotExists() throws Exception {
         Task task = createValidTask();
 
-        when(taskService.update(any(TaskRequestPutDto.class), eq(1L))).thenThrow(ResourceNotFoundException.class);
+        when(taskService.patch(any(TaskRequestPatchDto.class), eq(1L))).thenThrow(ResourceNotFoundException.class);
 
-        TaskRequestPutDto taskRequestPutDto = new TaskRequestPutDto("Tarefa de teste Update", task.getDescription(), task.getDueDate(), task.getTaskCategory());
-        String json = objectMapper.writeValueAsString(taskRequestPutDto);
+        TaskRequestPatchDto taskRequestPatchDto = new TaskRequestPatchDto("Tarefa de teste Update", task.getDescription(), task.getDueDate(), task.getTaskCategory());
+        String json = objectMapper.writeValueAsString(taskRequestPatchDto);
 
         mockMvc.perform(put("/tasks/{id}", 1).contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isNotFound())

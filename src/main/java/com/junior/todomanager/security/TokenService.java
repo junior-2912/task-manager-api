@@ -39,6 +39,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             DecodedJWT decodedJWT = JWT.require(algorithm)
+                    .withIssuer("task-manager-api")
                     .build()
                     .verify(token);
 
