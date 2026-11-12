@@ -48,8 +48,8 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskResponseDto> replace(@PathVariable Long id, @Valid TaskRequestPutDto taskRequestPutDto) {
-        return ;
+    public ResponseEntity<TaskResponseDto> replace(@PathVariable Long id, @Valid @RequestBody TaskRequestPutDto taskRequestPutDto) {
+        return ResponseEntity.ok(service.replace(taskRequestPutDto, id));
     }
 
     @DeleteMapping("/{id}")

@@ -31,13 +31,11 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper mapper;
     private final AuthenticatedUserProvider authenticatedUserProvider;
-    private final RepositoryMethodInvocationListener repositoryMethodInvocationListener;
 
-    public TaskService(TaskRepository taskRepository, TaskMapper mapper, AuthenticatedUserProvider authenticatedUserProvider, RepositoryMethodInvocationListener repositoryMethodInvocationListener) {
+    public TaskService(TaskRepository taskRepository, TaskMapper mapper, AuthenticatedUserProvider authenticatedUserProvider) {
         this.taskRepository = taskRepository;
         this.mapper = mapper;
         this.authenticatedUserProvider = authenticatedUserProvider;
-        this.repositoryMethodInvocationListener = repositoryMethodInvocationListener;
     }
 
     public Page<TaskResponseDto> findAll(Pageable pageable, TaskStatus status, TaskCategory category, String title, Boolean overdue) {
@@ -58,7 +56,7 @@ public class TaskService {
     }
 
     public TaskResponseDto findById(Long id) {
-        return mapper.entityToTaskResponse(taskRepository.findByIdAndUserId(id, authenticatedUserProvider.getAuthenticatedUser().getId()).orElseThrow(() -> new ResourceNotFoundException("Task not found")));
+        return mapper.entityToTaskResponse(this.findTaskByIdForAuthenticatedUser(id));
     }
 
     @Transactional
@@ -75,21 +73,21 @@ public class TaskService {
         if (taskRequestPatchDto.getDueDate() != null && taskRequestPatchDto.getDueDate().isBefore(LocalDateTime.now())) {
             throw new DateInvalidException("Due date cannot be earlier than today");
         }
-        Task task = taskRepository.findByIdAndUserId(id, authenticatedUserProvider.getAuthenticatedUser().getId()).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+        Task task = findTaskByIdForAuthenticatedUser(id);
         mapper.updateTaskFromDto(taskRequestPatchDto, task);
         return mapper.entityToTaskResponse(taskRepository.save(task));
     }
 
     @Transactional
     public TaskResponseDto replace(TaskRequestPutDto taskRequestPutDto, Long id) {
-        Task taskPersisted = taskRepository.findByIdAndUserId(id, authenticatedUserProvider.getAuthenticatedUser().getId()).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+        Task taskPersisted = findTaskByIdForAuthenticatedUser(id);
         mapper.replaceTaskFromDto(taskRequestPutDto, taskPersisted);
         return mapper.entityToTaskResponse(taskRepository.save(taskPersisted));
     }
 
     @Transactional
     public void deleteById(Long id) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+        Task task = findTaskByIdForAuthenticatedUser(id);
         if (task.getTaskStatus().equals(TaskStatus.IN_PROGRESS) || task.getTaskStatus().equals(TaskStatus.PENDING)) {
             throw new DeleteTaskException("Actives task cannot be deleted");
         }
@@ -97,18 +95,8 @@ public class TaskService {
     }
 
     @Transactional
-    public void finishTask(Long id) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
-        if (task.getTaskStatus().equals(TaskStatus.FINISHED) || task.getTaskStatus().equals(TaskStatus.CANCELED)) {
-            throw new TaskAlreadyFinishedException("This task has already been finished");
-        }
-        task.finishTask();
-        taskRepository.save(task);
-    }
-
-    @Transactional
     public TaskResponseDto changeTaskStatus(Long id, TaskStatusRequestDto taskStatusRequestDto) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+        Task task = findTaskByIdForAuthenticatedUser(id);
 
         if (task.getTaskStatus().equals(TaskStatus.FINISHED) || task.getTaskStatus().equals(TaskStatus.CANCELED)) {
             throw new TaskAlreadyFinishedException("This task has already been finished");
@@ -121,5 +109,9 @@ public class TaskService {
         }
 
         return mapper.entityToTaskResponse(taskRepository.save(task));
+    }
+
+    private Task findTaskByIdForAuthenticatedUser(Long id) {
+        return taskRepository.findByIdAndUserId(id, authenticatedUserProvider.getAuthenticatedUser().getId()).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
     }
 }

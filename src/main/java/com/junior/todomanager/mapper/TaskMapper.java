@@ -28,6 +28,7 @@ public interface TaskMapper {
     void updateTaskFromDto(TaskRequestPatchDto taskRequestPatchDto, @MappingTarget Task entity);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "taskStatus", ignore = true)
     @Mapping(target = "user", ignore = true)
     void replaceTaskFromDto(TaskRequestPutDto taskRequestPutDto, @MappingTarget Task entity);
 }

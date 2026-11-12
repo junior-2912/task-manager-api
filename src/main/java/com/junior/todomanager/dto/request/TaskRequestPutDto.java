@@ -8,6 +8,6 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
-public record TaskRequestPutDto(@NotBlank String title, @NotBlank String description, @NotEmpty TaskStatus taskStatus,
-                                @NotNull LocalDateTime dueDate , @NotEmpty TaskCategory taskCategory) {
+public record TaskRequestPutDto(@NotBlank String title, @NotBlank String description,
+                                @NotNull LocalDateTime dueDate , @NotNull TaskCategory taskCategory) {
 }

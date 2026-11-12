@@ -16,6 +16,7 @@ public class TaskRequestPostDto {
     @NotBlank
     private String title;
     private String description;
+    @NotNull
     private LocalDateTime dueDate;
     @NotNull
     private TaskCategory taskCategory;
