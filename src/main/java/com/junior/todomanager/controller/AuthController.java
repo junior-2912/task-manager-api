@@ -5,33 +5,32 @@ import com.junior.todomanager.dto.request.LoginRequestDto;
 import com.junior.todomanager.dto.request.RegisterUserRequestDto;
 import com.junior.todomanager.dto.response.LoginResponseDto;
 import com.junior.todomanager.dto.response.RegisterUserResponseDto;
-import com.junior.todomanager.repository.UserRepository;
 import com.junior.todomanager.security.TokenService;
+import com.junior.todomanager.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
-    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
-    public AuthController(UserRepository userRepository, AuthenticationManager authenticationManager, TokenService tokenService, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
+    public AuthController(AuthenticationManager authenticationManager, TokenService tokenService, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
-        this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
@@ -47,15 +46,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<RegisterUserResponseDto> register(@RequestBody @Valid RegisterUserRequestDto request) {
-        if (userRepository.findByEmail(request.email()).isPresent()) return ResponseEntity.badRequest().build();
-        User user = new User();
+        Optional<RegisterUserResponseDto> registerUserResponseDto = userService.registerUser(request);
 
-        user.setName(request.name());
-        user.setEmail(request.email());
-        user.setPassword(passwordEncoder.encode(request.password()));
+        if (registerUserResponseDto.isEmpty()) return ResponseEntity.badRequest().build();
 
-        userRepository.save(user);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(new RegisterUserResponseDto(user.getName(), user.getEmail()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(registerUserResponseDto.get());
     }
 }

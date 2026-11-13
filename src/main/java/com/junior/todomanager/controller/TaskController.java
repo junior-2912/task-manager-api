@@ -43,7 +43,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<TaskResponseDto> patch(@RequestBody TaskRequestPatchDto taskRequestPatchDto, @PathVariable Long id) {
+    public ResponseEntity<TaskResponseDto> patch(@Valid @RequestBody TaskRequestPatchDto taskRequestPatchDto, @PathVariable Long id) {
         return ResponseEntity.ok(service.patch(taskRequestPatchDto, id));
     }
 

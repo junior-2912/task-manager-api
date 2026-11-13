@@ -80,6 +80,9 @@ public class TaskService {
 
     @Transactional
     public TaskResponseDto replace(TaskRequestPutDto taskRequestPutDto, Long id) {
+        if (taskRequestPutDto.dueDate().isBefore(LocalDateTime.now())) {
+            throw new DateInvalidException("Due date cannot be earlier than today");
+        }
         Task taskPersisted = findTaskByIdForAuthenticatedUser(id);
         mapper.replaceTaskFromDto(taskRequestPutDto, taskPersisted);
         return mapper.entityToTaskResponse(taskRepository.save(taskPersisted));

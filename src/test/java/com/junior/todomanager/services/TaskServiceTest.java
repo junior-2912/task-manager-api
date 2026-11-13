@@ -4,6 +4,8 @@ import com.junior.todomanager.domain.Task;
 import com.junior.todomanager.domain.User;
 import com.junior.todomanager.dto.request.TaskRequestPostDto;
 import com.junior.todomanager.dto.request.TaskRequestPatchDto;
+import com.junior.todomanager.dto.request.TaskRequestPutDto;
+import com.junior.todomanager.dto.request.TaskStatusRequestDto;
 import com.junior.todomanager.dto.response.TaskResponseDto;
 import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
@@ -39,6 +41,11 @@ class TaskServiceTest {
 
         @Override
         public void updateTaskFromDto(TaskRequestPatchDto taskRequestPatchDto, Task entity) {
+
+        }
+
+        @Override
+        public void replaceTaskFromDto(TaskRequestPutDto taskRequestPutDto, Task entity) {
 
         }
     };
@@ -101,22 +108,6 @@ class TaskServiceTest {
         verify(taskRepository, never()).deleteById(1000L);
     }
 
-    @Test
-    void finishTak_shouldThrowExceptionWhenTaskAlreadyFinished() {
-        TaskRepository taskRepository = mock(TaskRepository.class);
-        TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
-
-        User user = new User(1L, "Usuario de teste", "teste@email.com", "secreta");
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
-        task.setId(1000L);
-        task.setTaskStatus(TaskStatus.FINISHED);
-
-        when(taskRepository.findById(1000L)).thenReturn(Optional.of(task));
-
-        assertThrows(TaskAlreadyFinishedException.class, () -> taskService.finishTask(1000L));
-
-        verify(taskRepository, never()).save(task);
-    }
 
     @Test
     void changeTaskStatus_shouldThrowExceptionWhenTaskAlreadyFinished() {
@@ -136,7 +127,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void finishTask_shouldFinishTaskSuccessfully() {
+    void changeStatus_shouldFinishTaskSuccessfully() {
         TaskRepository taskRepository = mock(TaskRepository.class);
         TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
@@ -146,7 +137,7 @@ class TaskServiceTest {
 
         when(taskRepository.findById(1000L)).thenReturn(Optional.of(task));
 
-        taskService.finishTask(1000L);
+        taskService.changeTaskStatus(1000L, new TaskStatusRequestDto(TaskStatus.FINISHED));
         assertEquals(TaskStatus.FINISHED, task.getTaskStatus());
         verify(taskRepository).save(task);
     }
