@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -33,15 +34,17 @@ public class SecurityFilter extends OncePerRequestFilter {
             String token = authorizedHeader.substring("Bearer ".length());
             Optional<JWTUserData> optUser = tokenService.validateToken(token);
 
-            if (optUser.isPresent()) {
-                JWTUserData userData = optUser.get();
-                UserDetails userDetails = userAuthenticationService.loadUserByUsername(userData.email());
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-                SecurityContext context = SecurityContextHolder.createEmptyContext();
-                context.setAuthentication(authenticationToken);
-                SecurityContextHolder.setContext(context);
-            }
+            if (optUser.isEmpty()) throw new UsernameNotFoundException("Email or password invalids");
+
+            JWTUserData userData = optUser.get();
+            UserDetails userDetails = userAuthenticationService.loadUserByUsername(userData.email());
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authenticationToken);
+            SecurityContextHolder.setContext(context);
+
         }
         filterChain.doFilter(request, response);
     }

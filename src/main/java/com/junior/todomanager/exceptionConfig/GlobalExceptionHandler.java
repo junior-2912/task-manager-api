@@ -4,6 +4,8 @@ import com.junior.todomanager.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -57,6 +59,32 @@ public class GlobalExceptionHandler {
         error.setError("Conflict");
         error.setTimestamp(Instant.now());
         error.setStatus(HttpStatus.CONFLICT.value());
+        error.setMessage(e.getMessage());
+        error.setPath(request.getRequestURI());
+
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<StandardError> badCredentialsException(BadCredentialsException e, HttpServletRequest request) {
+        StandardError error = new StandardError();
+
+        error.setError("Unauthorized");
+        error.setTimestamp(Instant.now());
+        error.setStatus(HttpStatus.UNAUTHORIZED.value());
+        error.setMessage("Email or password invalids");
+        error.setPath(request.getRequestURI());
+
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<StandardError> usernameNotFoundException(UsernameNotFoundException e, HttpServletRequest request) {
+        StandardError error = new StandardError();
+
+        error.setError("Unauthorized");
+        error.setTimestamp(Instant.now());
+        error.setStatus(HttpStatus.UNAUTHORIZED.value());
         error.setMessage(e.getMessage());
         error.setPath(request.getRequestURI());
 
