@@ -2,6 +2,8 @@ package com.junior.todomanager.exceptionConfig;
 
 import com.junior.todomanager.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -85,6 +87,19 @@ public class GlobalExceptionHandler {
         error.setError("Unauthorized");
         error.setTimestamp(Instant.now());
         error.setStatus(HttpStatus.UNAUTHORIZED.value());
+        error.setMessage(e.getMessage());
+        error.setPath(request.getRequestURI());
+
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<StandardError> constraintViolationException(ConstraintViolationException e, HttpServletRequest request) {
+        StandardError error = new StandardError();
+
+        error.setError("Validation error");
+        error.setTimestamp(Instant.now());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
         error.setMessage(e.getMessage());
         error.setPath(request.getRequestURI());
 

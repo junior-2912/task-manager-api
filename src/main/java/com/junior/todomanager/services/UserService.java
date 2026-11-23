@@ -5,6 +5,8 @@ import com.junior.todomanager.dto.request.RegisterUserRequestDto;
 import com.junior.todomanager.dto.response.RegisterUserResponseDto;
 import com.junior.todomanager.mapper.UserMapper;
 import com.junior.todomanager.repository.UserRepository;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +25,16 @@ public class UserService {
     }
 
     public Optional<RegisterUserResponseDto> registerUser(RegisterUserRequestDto registerUserRequestDto) {
-        if (repository.findByEmail(registerUserRequestDto.email()).isPresent()) return Optional.empty();
-        User user = userMapper.registerUserDtoToUserEntity(registerUserRequestDto);
-        user.setPassword(passwordEncoder.encode(registerUserRequestDto.password()));
-        RegisterUserResponseDto registerUserResponseDto = userMapper.entityUserToResponseDto(repository.save(user));
-        return Optional.of(registerUserResponseDto);
+        try {
+            if (repository.findByEmail(registerUserRequestDto.email()).isPresent()) return Optional.empty();
+            User user = userMapper.registerUserDtoToUserEntity(registerUserRequestDto);
+            user.setPassword(passwordEncoder.encode(registerUserRequestDto.password()));
+            RegisterUserResponseDto registerUserResponseDto = userMapper.entityUserToResponseDto(repository.save(user));
+            return Optional.of(registerUserResponseDto);
+        } catch (DataIntegrityViolationException e) {
+            return Optional.empty();
+        }
+
+
     }
 }

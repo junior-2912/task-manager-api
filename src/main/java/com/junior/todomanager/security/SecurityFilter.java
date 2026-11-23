@@ -34,17 +34,19 @@ public class SecurityFilter extends OncePerRequestFilter {
             String token = authorizedHeader.substring("Bearer ".length());
             Optional<JWTUserData> optUser = tokenService.validateToken(token);
 
+            if (optUser.isPresent()) {
+                try {
+                    JWTUserData userData = optUser.get();
+                    UserDetails userDetails = userAuthenticationService.loadUserByUsername(userData.email());
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-            if (optUser.isEmpty()) throw new UsernameNotFoundException("Email or password invalids");
-
-            JWTUserData userData = optUser.get();
-            UserDetails userDetails = userAuthenticationService.loadUserByUsername(userData.email());
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-            SecurityContext context = SecurityContextHolder.createEmptyContext();
-            context.setAuthentication(authenticationToken);
-            SecurityContextHolder.setContext(context);
-
+                    SecurityContext context = SecurityContextHolder.createEmptyContext();
+                    context.setAuthentication(authenticationToken);
+                    SecurityContextHolder.setContext(context);
+                } catch (UsernameNotFoundException e) {
+                    SecurityContextHolder.clearContext();
+                }
+            }
         }
         filterChain.doFilter(request, response);
     }
