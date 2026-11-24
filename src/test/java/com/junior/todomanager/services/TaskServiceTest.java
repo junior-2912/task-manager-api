@@ -28,29 +28,10 @@ import static org.mockito.Mockito.*;
 
 class TaskServiceTest {
 
-    private TaskMapper mapper = new TaskMapper() {
-        @Override
-        public Task requestPostToTaskEntity(TaskRequestPostDto taskRequestPostDto, User user) {
-            return null;
-        }
+    private TaskMapper mapper = mock(TaskMapper.class);
 
-        @Override
-        public TaskResponseDto entityToTaskResponse(Task task) {
-            return null;
-        }
+    private AuthenticatedUserProvider authenticatedUserProvider =  mock(AuthenticatedUserProvider.class);
 
-        @Override
-        public void updateTaskFromDto(TaskRequestPatchDto taskRequestPatchDto, Task entity) {
-
-        }
-
-        @Override
-        public void replaceTaskFromDto(TaskRequestPutDto taskRequestPutDto, Task entity) {
-
-        }
-    };
-
-    private AuthenticatedUserProvider authenticatedUserProvider =  new AuthenticatedUserProvider();
     @Test
     void findById_shouldThrowExceptionWhenCannotFoundTaskById() {
         TaskRepository taskRepository = mock(TaskRepository.class);
