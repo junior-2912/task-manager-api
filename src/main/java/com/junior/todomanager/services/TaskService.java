@@ -1,11 +1,11 @@
 package com.junior.todomanager.services;
 
 import com.junior.todomanager.domain.Task;
-import com.junior.todomanager.dto.request.TaskRequestPostDto;
 import com.junior.todomanager.dto.request.TaskRequestPatchDto;
+import com.junior.todomanager.dto.request.TaskRequestPostDto;
 import com.junior.todomanager.dto.request.TaskRequestPutDto;
-import com.junior.todomanager.dto.response.TaskResponseDto;
 import com.junior.todomanager.dto.request.TaskStatusRequestDto;
+import com.junior.todomanager.dto.response.TaskResponseDto;
 import com.junior.todomanager.enums.TaskCategory;
 import com.junior.todomanager.enums.TaskStatus;
 import com.junior.todomanager.exceptions.DateInvalidException;
@@ -19,12 +19,10 @@ import com.junior.todomanager.util.AuthenticatedUserProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.repository.core.support.RepositoryMethodInvocationListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class TaskService {
