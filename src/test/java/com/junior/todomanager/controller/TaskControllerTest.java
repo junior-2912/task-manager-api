@@ -124,7 +124,7 @@ class TaskControllerTest {
 
         when(taskService.patch(any(TaskRequestPatchDto.class), eq(1L))).thenReturn(mapper.entityToTaskResponse(task));
 
-        TaskRequestPatchDto taskRequestPatchDto = new TaskRequestPatchDto("Tarefa de teste Update", task.getDescription(), task.getDueDate(), task.getTaskCategory());
+        TaskRequestPatchDto taskRequestPatchDto = new TaskRequestPatchDto("Updated test task", task.getDescription(), task.getDueDate(), task.getTaskCategory());
         String json = objectMapper.writeValueAsString(taskRequestPatchDto);
 
         mockMvc.perform(put("/tasks/{id}", 1).contentType(MediaType.APPLICATION_JSON).content(json))
@@ -138,7 +138,7 @@ class TaskControllerTest {
 
         when(taskService.patch(any(TaskRequestPatchDto.class), eq(1L))).thenThrow(ResourceNotFoundException.class);
 
-        TaskRequestPatchDto taskRequestPatchDto = new TaskRequestPatchDto("Tarefa de teste Update", task.getDescription(), task.getDueDate(), task.getTaskCategory());
+        TaskRequestPatchDto taskRequestPatchDto = new TaskRequestPatchDto("Updated test task", task.getDescription(), task.getDueDate(), task.getTaskCategory());
         String json = objectMapper.writeValueAsString(taskRequestPatchDto);
 
         mockMvc.perform(put("/tasks/{id}", 1).contentType(MediaType.APPLICATION_JSON).content(json))
@@ -194,19 +194,19 @@ class TaskControllerTest {
     }
 
     private static Task createValidTask() {
-        return new Task(1L, "Tarefa de teste 1",
-                "Fazendo teste com JUnit",
+        return new Task(1L, "Test task 1",
+                "Running JUnit tests",
                 TaskStatus.PENDING,
                 LocalDateTime.parse("2027-01-05T12:00:00"),
                 TaskCategory.PERSONAL,
-                new User(1L, "Usuario de teste", "teste@email.com", "secreta"));
+                new User(1L, "Test User", "test@example.com", "password"));
     }
 
     private static Task createTaskToBeSaved() {
-        return new Task("Tarefa de teste 1",
-                "Fazendo teste com JUnit",
+        return new Task("Test task 1",
+                "Running JUnit tests",
                 LocalDateTime.parse("2027-01-05T12:00:00"),
                 TaskCategory.PERSONAL,
-                new User(1L, "Usuario de teste", "teste@email.com", "secreta"));
+                new User(1L, "Test User", "test@example.com", "password"));
     }
 }

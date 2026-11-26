@@ -36,7 +36,7 @@ class TaskServiceTest {
     void findById_shouldThrowExceptionWhenCannotFoundTaskById() {
         TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
-        User user = new User(7L, "Usuario de teste", "teste@email.com", "secreta");
+        User user = new User(7L, "Test User", "test@example.com", "password");
         when(taskRepository.findByIdAndUserId(999L, 7L)).thenReturn(Optional.empty());
         when(authenticatedUserProvider.getAuthenticatedUser()).thenReturn(user);
 
@@ -45,12 +45,26 @@ class TaskServiceTest {
     }
 
     @Test
-    void saveReplaceAndPatch_shouldThrowExceptionWHenDueDateIsBeforeCreateDate() {
+    void findById_shouldThrowWhenTaskDoesNotBelongToAuthenticatedUser() {
+        TaskService service = new TaskService(taskRepository, mapper, authenticatedUserProvider);
+        User user = new User(8L, "Second Test User", "test2@example.com", "password2");
+
+        // Simulate the repository finding no task with ID 100 owned by user 8.
+        when(taskRepository.findByIdAndUserId(100L, 8L)).thenReturn(Optional.empty());
+        when(authenticatedUserProvider.getAuthenticatedUser()).thenReturn(user);
+
+        assertThrows(ResourceNotFoundException.class, () -> service.findById(100L));
+        // Verify that the service searched using the authenticated user's ID.
+        verify(taskRepository).findByIdAndUserId(100L, 8L);
+    }
+
+    @Test
+    void saveReplaceAndPatch_shouldThrowWhenDueDateIsInThePast() {
         TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
-        TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
-        TaskRequestPatchDto taskRequestPatchDto = new TaskRequestPatchDto("Tarefa de teste 2", "Fazendo teste com JUnit", LocalDateTime.parse("2001-01-05T12:00:00"), TaskCategory.PERSONAL);
-        TaskRequestPutDto taskRequestPutDto = new TaskRequestPutDto("Tarefa de teste 3", "Fazendo teste com JUnit", LocalDateTime.parse("2001-01-05T12:00:00"), TaskCategory.PERSONAL);
+        TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto("Test task 1", "Running JUnit tests", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL);
+        TaskRequestPatchDto taskRequestPatchDto = new TaskRequestPatchDto("Test task 2", "Running JUnit tests", LocalDateTime.parse("2001-01-05T12:00:00"), TaskCategory.PERSONAL);
+        TaskRequestPutDto taskRequestPutDto = new TaskRequestPutDto("Test task 3", "Running JUnit tests", LocalDateTime.parse("2001-01-05T12:00:00"), TaskCategory.PERSONAL);
 
 
         assertThrows(DateInvalidException.class, () -> taskService.save(taskRequestPostDto));
@@ -64,8 +78,8 @@ class TaskServiceTest {
     void deleteById_shouldThrowExceptionWhenDeletingActiveTask() {
         TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
-        User user = new User(7L, "Usuario de teste", "teste@email.com", "secreta");
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
+        User user = new User(7L, "Test User", "test@example.com", "password");
+        Task task = new Task("Test task 1", "Running JUnit tests", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
         task.setId(1000L);
 
         when(taskRepository.findByIdAndUserId(1000L, 7L)).thenReturn(Optional.of(task));
@@ -81,8 +95,8 @@ class TaskServiceTest {
     void changeTaskStatus_shouldThrowExceptionWhenTaskAlreadyFinished() {
         TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
-        User user = new User(7L, "Usuario de teste", "teste@email.com", "secreta");
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
+        User user = new User(7L, "Test User", "test@example.com", "password");
+        Task task = new Task("Test task 1", "Running JUnit tests", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
         task.setId(1000L);
         task.setTaskStatus(TaskStatus.FINISHED);
 
@@ -98,8 +112,8 @@ class TaskServiceTest {
     void changeTaskStatus_shouldFinishTaskSuccessfully() {
         TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
-        User user = new User(7L, "Usuario de teste", "teste@email.com", "secreta");
-        Task task = new Task("Tarefa de teste 1", "Fazendo teste com JUnit", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
+        User user = new User(7L, "Test User", "test@example.com", "password");
+        Task task = new Task("Test task 1", "Running JUnit tests", LocalDateTime.parse("2000-01-05T12:00:00"), TaskCategory.PERSONAL, user);
         task.setId(1000L);
 
         when(taskRepository.findByIdAndUserId(1000L, 7L)).thenReturn(Optional.of(task));
@@ -114,12 +128,12 @@ class TaskServiceTest {
     void save_shouldSaveAValidTask() {
         TaskService taskService = new TaskService(taskRepository, mapper, authenticatedUserProvider);
 
-        TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto("Tarefa de teste 1",
-                "Fazendo teste com JUnit",
+        TaskRequestPostDto taskRequestPostDto = new TaskRequestPostDto("Test task 1",
+                "Running JUnit tests",
                 LocalDateTime.parse("3000-01-05T12:00:00"),
                 TaskCategory.PERSONAL);
 
-        User user = new User(7L, "Teste", "teste@email", "senha");
+        User user = new User(7L, "Test User", "test@example.com", "password");
 
         when(authenticatedUserProvider.getAuthenticatedUser()).thenReturn(user);
         when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -130,9 +144,9 @@ class TaskServiceTest {
         verify(taskRepository).save(captor.capture());
 
         assertSame(user, captor.getValue().getUser());
-        assertEquals("Fazendo teste com JUnit", captor.getValue().getDescription());
+        assertEquals("Running JUnit tests", captor.getValue().getDescription());
         assertEquals(LocalDateTime.parse("3000-01-05T12:00:00"), captor.getValue().getDueDate());
         assertEquals(TaskCategory.PERSONAL, captor.getValue().getTaskCategory());
-        assertEquals("Tarefa de teste 1", answer.getTitle());
+        assertEquals("Test task 1", answer.getTitle());
     }
 }
