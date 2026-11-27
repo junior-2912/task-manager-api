@@ -12,21 +12,27 @@ import com.junior.todomanager.exceptions.DeleteTaskException;
 import com.junior.todomanager.exceptions.ResourceNotFoundException;
 import com.junior.todomanager.exceptions.TaskAlreadyFinishedException;
 import com.junior.todomanager.mapper.TaskMapper;
+import com.junior.todomanager.security.SecurityConfig;
+import com.junior.todomanager.security.TokenService;
 import com.junior.todomanager.services.TaskService;
+import com.junior.todomanager.services.UserAuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -37,14 +43,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(controllers = TaskController.class, includeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = TaskMapper.class)
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+                                classes = TaskMapper.class)
 })
+@Import(SecurityConfig.class)
 class TaskControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
     private TaskService taskService;
+
+    @MockitoBean
+    private TokenService tokenService;
+
+    @MockitoBean
+    private UserAuthenticationService userAuthenticationService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -53,18 +67,20 @@ class TaskControllerTest {
     private TaskMapper mapper;
 
     @Test
+    @WithMockUser(username = "test@example.com")
     void findAll_shouldReturn200WhenSuccessfully() throws Exception {
-        PageImpl<TaskResponseDto> taskPage = new PageImpl<>(List.of(createValidTask()).stream().map(mapper::entityToTaskResponse).toList());
+        PageImpl<TaskResponseDto> taskPage = new PageImpl<>(Stream.of(createValidTask()).map(mapper::entityToTaskResponse).toList());
 
         when(taskService.findAll(any(Pageable.class), any(), any(), any(), any())).thenReturn(taskPage);
 
         mockMvc.perform(get("/tasks"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.content").exists());
+                .andExpect(jsonPath("$.content[*].title").exists());
     }
 
     @Test
+    @WithMockUser(username = "test@example.com")
     void findById_shouldReturnATaskWhenSuccessfully() throws Exception {
         Task task = createValidTask();
 
@@ -73,7 +89,7 @@ class TaskControllerTest {
         mockMvc.perform(get("/tasks/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.title").exists());
+                .andExpect(jsonPath("$.title").value(task.getTitle()));
     }
 
     @Test
